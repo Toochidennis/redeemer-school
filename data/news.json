@@ -1,0 +1,50 @@
+[
+  {
+    "id": "news_1784020000001",
+    "title": "Admission enquiries are open",
+    "slug": "admission-enquiries-open",
+    "category": "Admissions",
+    "summary": "Parents and guardians can contact the school office for admission guidance and class placement support.",
+    "content": "Redeemers International School, Enugu welcomes admission enquiries from parents and guardians.\n\nThe admissions team guides families through class placement, entrance assessment information, and registration steps.",
+    "image": "redeemers/optimized/campus.webp",
+    "status": "published",
+    "createdAt": "2026-07-14T10:00:00+01:00",
+    "updatedAt": "2026-07-14T10:00:00+01:00"
+  },
+  {
+    "id": "news_1784020000002",
+    "title": "Learning in the classroom",
+    "slug": "learning-in-the-classroom",
+    "category": "Academics",
+    "summary": "Classroom teaching remains central to the school’s academic structure and learner development.",
+    "content": "The classroom environment at Redeemers International School supports daily lessons, guided practice, assessment, and teacher attention.\n\nLearners are encouraged to build confidence, discipline, and steady academic habits.",
+    "image": "redeemers/optimized/classroom.webp",
+    "status": "published",
+    "createdAt": "2026-07-14T10:00:00+01:00",
+    "updatedAt": "2026-07-14T10:00:00+01:00"
+  },
+  {
+    "id": "news_1784020000003",
+    "title": "Practical science learning",
+    "slug": "practical-science-learning",
+    "category": "School Life",
+    "summary": "Students are shown engaging with laboratory instruments and practical demonstrations.",
+    "content": "Students learn in a laboratory setting where practical exposure helps learners connect classroom lessons with observation, handling of instruments, and guided demonstrations.",
+    "image": "redeemers/optimized/laboratory.webp",
+    "status": "published",
+    "createdAt": "2026-07-14T10:00:00+01:00",
+    "updatedAt": "2026-07-14T10:00:00+01:00"
+  },
+  {
+    "id": "news_1784020000004",
+    "title": "Knowledge And Fear of The Lord",
+    "slug": "knowledge-and-fear-of-the-lord",
+    "category": "Notice",
+    "summary": "The school motto is preserved as the guiding language for this new website.",
+    "content": "The Redeemers International School crest carries the motto “Knowledge And Fear of The Lord.”\n\nThe new website uses this language as a consistent expression of the school’s identity and values.",
+    "image": "redeemers/optimized/badge.webp",
+    "status": "published",
+    "createdAt": "2026-07-14T10:00:00+01:00",
+    "updatedAt": "2026-07-14T10:00:00+01:00"
+  }
+]

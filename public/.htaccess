@@ -1,0 +1,14 @@
+DirectoryIndex index.html
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Keep real files and folders working: assets, images, api/*.php, robots.txt, etc.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # React owns clean frontend routes such as /about, /news, /admin_login.
+  RewriteRule ^ index.html [L]
+</IfModule>

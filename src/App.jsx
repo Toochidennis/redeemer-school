@@ -1,0 +1,304 @@
+import React, { useEffect, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import './styles.css';
+import { NEWS_CATEGORIES, NEWS_IMAGE_OPTIONS } from './news-data.js';
+import {
+  createNews,
+  deleteNews,
+  getAdminNews,
+  getAdminNewsById,
+  getNewsBySlug,
+  getPublicNews,
+  publishNews,
+  unpublishNews,
+  updateNews
+} from './news-service.js';
+import { getCurrentAdmin, login, logout } from './admin-auth.js';
+
+const ROUTES = ['about', 'academics', 'admissions', 'contact', 'news', 'news_detail', 'admin_login', 'admin_news', 'admin_news_form'];
+
+function routeFromLocation() {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  return parts.find((part) => ROUTES.includes(part)) || 'home';
+}
+
+function navigate(to) {
+  window.history.pushState({}, '', to);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function Link({ to, children, className, ...props }) {
+  return (
+    <a
+      href={to}
+      className={className}
+      onClick={(event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || props.target) return;
+        event.preventDefault();
+        navigate(to);
+      }}
+      {...props}
+    >
+      {children}
+    </a>
+  );
+}
+
+function Header({ route }) {
+  const [open, setOpen] = useState(false);
+  const nav = [
+    ['home', './', 'Home'],
+    ['about', 'about', 'About'],
+    ['academics', 'academics', 'Academics'],
+    ['admissions', 'admissions', 'Admissions'],
+    ['news', 'news', 'News'],
+    ['contact', 'contact', 'Contact']
+  ];
+
+  return (
+    <header className="site-header">
+      <div className="nav-wrap">
+        <Link className="brand" to="./">
+          <img src="redeemers/optimized/badge.webp" alt="Redeemers International School crest" />
+          <span><strong>Redeemers International School</strong><span>Enugu</span></span>
+        </Link>
+        <button className="nav-toggle" type="button" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(!open)}>☰</button>
+        <nav className={`site-nav${open ? ' is-open' : ''}`} id="site-nav" aria-label="Main navigation">
+          {nav.map(([key, href, label]) => (
+            <Link key={key} to={href} className={(route === key || (key === 'news' && route === 'news_detail')) ? 'is-active' : ''}>{label}</Link>
+          ))}
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-grid">
+        <div><img src="redeemers/optimized/badge.webp" alt="" /><strong>Redeemers International School, Enugu</strong><p>Knowledge And Fear of The Lord.</p></div>
+        <div><strong>Pages</strong><Link to="./">Home</Link><Link to="about">About</Link><Link to="academics">Academics</Link><Link to="admissions">Admissions</Link><Link to="news">News</Link></div>
+        <div><strong>Admin</strong><Link to="admin_login">News login</Link><p>School updates are managed through the news desk.</p></div>
+      </div>
+    </footer>
+  );
+}
+
+function PageHero({ kicker, title, text, image, alt }) {
+  return (
+    <section className="page-hero">
+      <div className="container">
+        <div><span className="kicker">{kicker}</span><h1>{title}</h1><p>{text}</p></div>
+        <img src={image} alt={alt} />
+      </div>
+    </section>
+  );
+}
+
+function SectionHead({ kicker, title, text }) {
+  return <div className="section-head"><div><span className="kicker">{kicker}</span><h2>{title}</h2></div><p>{text}</p></div>;
+}
+
+function NewsCard({ post }) {
+  return (
+    <article className="news-card">
+      <img className="news-card-image" src={post.image} alt={post.title} loading="lazy" />
+      <span className="news-pill">{post.category}</span>
+      <h3>{post.title}</h3>
+      <p>{post.summary}</p>
+      <Link to={`news_detail?slug=${encodeURIComponent(post.slug)}`}>Read More <span aria-hidden="true">→</span></Link>
+    </article>
+  );
+}
+
+function ContactForm({ admission = false }) {
+  const [message, setMessage] = useState('');
+  return (
+    <form className="contact-panel form-grid" onSubmit={(event) => {
+      event.preventDefault();
+      setMessage('Thank you. The school office will review your enquiry.');
+      event.currentTarget.reset();
+    }}>
+      <label>{admission ? 'Parent or guardian name' : 'Name'}<input name="name" autoComplete="name" required /></label>
+      <label>{admission ? 'Phone or email' : 'Email or phone'}<input name="contact" required /></label>
+      {admission ? <label>Class of interest<input name="class" /></label> : <label>Subject<input name="subject" /></label>}
+      <label>Message<textarea name="message" required={!admission}></textarea></label>
+      <button className="btn btn-primary" type="submit">{admission ? 'Send enquiry' : 'Send message'}</button>
+      <p>{message}</p>
+    </form>
+  );
+}
+
+function Home() {
+  const [posts, setPosts] = useState([]);
+  useEffect(() => { getPublicNews().then((items) => setPosts(items.slice(0, 3))); }, []);
+  return (
+    <>
+      <section className="hero">
+        <img className="hero-bg" src="redeemers/optimized/campus.webp" alt="Redeemers International School campus" />
+        <div className="hero-inner">
+          <span className="kicker">Rise with purpose</span>
+          <h1>Knowledge, character, and practical learning in Enugu.</h1>
+          <p>Redeemers International School brings classroom teaching, laboratory experience, and values-based formation into one focused school environment.</p>
+          <div className="hero-actions"><Link className="btn btn-primary" to="admissions">Start admission enquiry</Link><Link className="btn btn-outline" to="academics">Explore academics</Link></div>
+          <div className="hero-strip"><div><strong>Enugu</strong><span>School location shown on the crest</span></div><div><strong>RISE</strong><span>A visible call within the school badge</span></div><div><strong>Faith & learning</strong><span>Knowledge And Fear of The Lord</span></div></div>
+        </div>
+      </section>
+      <section className="section"><div className="container"><SectionHead kicker="School Life" title="A school day built around attention and practice." text="Classrooms, science work, and guided practical learning are central to the school experience." /><div className="grid-3"><article className="card"><h3>Classroom focus</h3><p>Organized class settings for daily learning, assessment, and teacher-led support.</p></article><article className="card"><h3>Science exposure</h3><p>Learners engage with instruments, observation, and practical demonstrations.</p></article><article className="card"><h3>Character formation</h3><p>The school motto anchors learning in knowledge, discipline, reverence, and responsibility.</p></article></div></div></section>
+      <section className="section alt"><div className="container feature-layout"><div><span className="kicker">Why Redeemers</span><h2>Built for parents who want visible learning, not vague promises.</h2><ul className="rail-list"><li><strong>Structured academics</strong><br />Core classroom learning presented clearly for nursery, primary, and secondary prospects.</li><li><strong>Practical experiences</strong><br />Science and skills-based activities are part of the visual identity of the school.</li><li><strong>Faith-informed values</strong><br />The motto is preserved as a public signal of the school’s formation priorities.</li></ul></div><div className="image-panel"><img src="redeemers/optimized/laboratory.webp" alt="Students working in the school laboratory" /></div></div></section>
+      <section className="section"><div className="container"><SectionHead kicker="Latest" title="News and notices" text="Published posts from the school news desk appear here. The admin area can add, edit, publish, and remove updates." /><div className="grid-3">{posts.map((post) => <NewsCard key={post.id} post={post} />)}</div><div className="section-actions"><Link className="btn btn-secondary" to="news">View all news</Link></div></div></section>
+      <section className="section dark"><div className="container gallery"><img src="redeemers/optimized/classroom.webp" alt="Students seated in class" /><img src="redeemers/optimized/practical-learning.webp" alt="Students observing practical work" /><img src="redeemers/optimized/excursion.webp" alt="Students on guided practical visit" /><img src="redeemers/optimized/skills-workshop.webp" alt="Students around workshop materials" /><img src="redeemers/optimized/school-block.webp" alt="School building exterior" /></div></section>
+    </>
+  );
+}
+
+function About() {
+  return (
+    <>
+      <PageHero kicker="About the school" title="Redeemers International School, Enugu" text="Redeemers International School is guided by the motto Knowledge And Fear of The Lord, with a learning environment shaped by academics, discipline, and practical development." image="redeemers/optimized/school-block.webp" alt="Redeemers school building exterior" />
+      <section className="section"><div className="container feature-layout about-identity"><div className="crest-panel"><img src="redeemers/optimized/badge.webp" alt="Redeemers International School badge" /></div><div><span className="kicker">Identity</span><h2>RISE is at the center of the crest.</h2><p>The crest combines an open book, dove, shield, and red ribbon. The design system uses those cues carefully: green for growth and institution, red for emphasis, and structured rails for order.</p><ul className="rail-list"><li><strong>School name</strong><br />Redeemers International School</li><li><strong>Location</strong><br />Enugu</li><li><strong>Motto</strong><br />Knowledge And Fear of The Lord</li></ul></div></div></section>
+      <section className="section alt"><div className="container"><SectionHead kicker="Campus" title="Real facilities lead the story." text="The school environment is presented through campus, classroom, and laboratory imagery." /><div className="grid-3"><article className="card"><h3>Campus</h3><p>Exterior photos present the school compound and building.</p></article><article className="card"><h3>Classrooms</h3><p>Class photos support the academic positioning of the site.</p></article><article className="card"><h3>Laboratory</h3><p>Science imagery helps communicate practical learning.</p></article></div></div></section>
+    </>
+  );
+}
+
+function Academics() {
+  return (
+    <>
+      <PageHero kicker="Academics" title="Learning with structure, practice, and values." text="The academic programme supports classroom learning, practical exposure, and steady learner development." image="redeemers/optimized/classroom.webp" alt="Students in a classroom" />
+      <section className="section"><div className="container"><SectionHead kicker="Programmes" title="Clear pathways for families to review." text="Learners are supported through foundational, primary, and secondary stages of development." /><div className="grid-3"><article className="program-card"><h3>Nursery</h3><p>Foundational literacy, numeracy, social habits, and guided early learning routines.</p></article><article className="program-card"><h3>Primary</h3><p>Core subjects, class projects, reading discipline, and steady academic development.</p></article><article className="program-card"><h3>Secondary</h3><p>Subject-based learning, science exposure, practical work, and examination readiness.</p></article></div></div></section>
+      <section className="section alt"><div className="container feature-layout"><div><span className="kicker">Practical learning</span><h2>Science and skill-based activities have a visible role.</h2><p>Students learn through observation, guided demonstrations, and hands-on academic experiences that support classroom teaching.</p><div className="section-actions"><Link className="btn btn-primary" to="admissions">Ask about admission</Link></div></div><div className="image-panel"><img src="redeemers/optimized/practical-learning.webp" alt="Students around practical learning equipment" /></div></div></section>
+    </>
+  );
+}
+
+function Admissions() {
+  return (
+    <>
+      <PageHero kicker="Admissions" title="Begin with a direct school enquiry." text="Families can start the admission process by contacting the school office and sharing the learner’s class level." image="redeemers/optimized/campus.webp" alt="Redeemers International School campus" />
+      <section className="section"><div className="container"><SectionHead kicker="Process" title="A simple flow for prospective parents." text="The admissions team guides families from enquiry to registration." /><div className="grid-3"><article className="card"><h3>1. Make an enquiry</h3><p>Contact the school or use the form to indicate the class level and learner details.</p></article><article className="card"><h3>2. Visit or receive guidance</h3><p>The school shares form requirements, fee guidance, and assessment information.</p></article><article className="card"><h3>3. Complete registration</h3><p>Submit required documents and complete the school’s official registration process.</p></article></div></div></section>
+      <section className="section alt"><div className="container contact-grid"><div className="contact-panel"><h2>Admissions office</h2><ul className="rail-list"><li>Admission enquiries</li><li>Class placement guidance</li><li>Entrance assessment information</li><li>Registration support</li></ul></div><ContactForm admission /></div></section>
+    </>
+  );
+}
+
+function Contact() {
+  return (
+    <>
+      <PageHero kicker="Contact" title="Reach the school office." text="Visit or contact Redeemers International School in Enugu for admissions, school visits, and general enquiries." image="redeemers/optimized/school-block.webp" alt="School exterior" />
+      <section className="section"><div className="container contact-grid"><div className="contact-panel"><h2>Redeemers International School</h2><ul className="rail-list"><li><strong>Location</strong><br />Enugu</li><li><strong>Motto</strong><br />Knowledge And Fear of The Lord</li><li><strong>Enquiries</strong><br />Admissions, academics, school visits, and general information</li></ul></div><ContactForm /></div></section>
+    </>
+  );
+}
+
+function NewsList() {
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1);
+  const perPage = 6;
+  useEffect(() => { getPublicNews().then(setPosts); }, []);
+  const total = Math.max(1, Math.ceil(posts.length / perPage));
+  const pagePosts = posts.slice((page - 1) * perPage, page * perPage);
+  return (
+    <>
+      <PageHero kicker="News" title="School updates and notices." text="Published posts are served by the file-based PHP CMS." image="redeemers/optimized/excursion.webp" alt="Students on practical visit" />
+      <section className="section"><div className="container"><div className="grid-3">{pagePosts.map((post) => <NewsCard key={post.id} post={post} />)}</div>{posts.length === 0 && <p className="center-note">No published news available right now.</p>}<nav className="pagination" aria-label="News pagination">{Array.from({ length: total }, (_, idx) => idx + 1).map((num) => <button key={num} className={num === page ? 'is-active' : ''} onClick={() => setPage(num)}>{num}</button>)}</nav></div></section>
+    </>
+  );
+}
+
+function NewsDetail() {
+  const [post, setPost] = useState(null);
+  const [related, setRelated] = useState([]);
+  const slug = new URLSearchParams(window.location.search).get('slug') || '';
+  useEffect(() => {
+    async function load() {
+      const item = await getNewsBySlug(slug);
+      setPost(item);
+      const items = await getPublicNews();
+      setRelated(items.filter((entry) => entry.slug !== slug).slice(0, 3));
+      if (item) document.title = `${item.title} | Redeemers International School`;
+    }
+    load();
+  }, [slug]);
+  if (!post) return <section className="section"><div className="container"><h1>News not found</h1><p>The requested news item is unavailable.</p><Link className="btn btn-secondary" to="news">Back to News</Link></div></section>;
+  return (
+    <>
+      <article className="news-article"><header className="news-article-hero"><Link className="news-back-link" to="news">← Back to News</Link><span className="news-pill">{post.category}</span><h1>{post.title}</h1><p>{post.summary}</p></header><figure className="news-article-figure"><img className="news-detail-image" src={post.image} alt={post.title} /></figure><div className="news-article-layout"><div className="news-article-body">{String(post.content || '').split(/\n+/).map((part) => <p key={part}>{part}</p>)}</div><aside className="news-article-side"><h2>Need more information?</h2><p>Contact the school office for admissions, visits, and general enquiries.</p><Link className="btn btn-secondary" to="contact">Contact Us</Link><Link className="btn btn-outline" to="admissions">Admissions</Link></aside></div></article>
+      <section className="section alt"><div className="container"><SectionHead kicker="More updates" title="Related news" text="Other published notices from the school." /><div className="grid-3">{related.map((item) => <NewsCard key={item.id} post={item} />)}</div></div></section>
+    </>
+  );
+}
+
+function AdminLogin() {
+  const [message, setMessage] = useState('');
+  async function submit(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setMessage('Signing in...');
+    const result = await login(form.get('username'), form.get('password'));
+    if (!result.ok) return setMessage(result.message);
+    navigate('admin_news');
+  }
+  return <main className="admin-login"><form className="admin-login-card form-grid" onSubmit={submit}><img src="redeemers/optimized/badge.webp" alt="Redeemers International School crest" /><div><span className="kicker">News admin</span><h1>Sign in</h1></div><label>Username<input name="username" autoComplete="username" required /></label><label>Password<input name="password" type="password" autoComplete="current-password" required /></label><button className="btn btn-primary" type="submit">Sign in</button><p className="admin-message">{message}</p><Link to="./">Back to site</Link></form></main>;
+}
+
+function AdminShell({ children, active }) {
+  const [admin, setAdmin] = useState(null);
+  useEffect(() => { getCurrentAdmin().then((user) => { if (!user) navigate('admin_login'); else setAdmin(user); }); }, []);
+  if (!admin) return null;
+  return <div className="admin-shell"><aside className="admin-sidebar"><img src="redeemers/optimized/badge.webp" alt="Redeemers International School crest" /><strong>Redeemers Admin</strong><p>{admin.name || admin.username}</p><nav className="admin-nav"><Link className={active === 'news' ? 'is-active' : ''} to="admin_news">News posts</Link><Link className={active === 'form' ? 'is-active' : ''} to="admin_news_form">Create post</Link><Link to="./">View site</Link><button type="button" onClick={async () => { await logout(); navigate('admin_login'); }}>Sign out</button></nav></aside><main className="admin-main">{children}</main></div>;
+}
+
+function AdminNews() {
+  const [posts, setPosts] = useState([]);
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('all');
+  async function reload() { setPosts(await getAdminNews()); }
+  useEffect(() => { reload(); }, []);
+  const rows = posts.filter((item) => {
+    const text = `${item.title} ${item.summary} ${item.category}`.toLowerCase();
+    const itemStatus = (item.status || '').toLowerCase();
+    return text.includes(query.toLowerCase()) && (status === 'all' || itemStatus === status.toLowerCase());
+  });
+  async function action(fn) { await fn(); await reload(); }
+  return <AdminShell active="news"><div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>Manage posts</h1></div><Link className="btn btn-primary" to="admin_news_form">Create post</Link></div><section className="admin-panel"><div className="admin-toolbar"><input type="search" placeholder="Search posts" value={query} onChange={(e) => setQuery(e.target.value)} /><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option></select></div><table className="admin-table"><thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{rows.map((item) => <tr key={item.id}><td><div className="admin-post-cell"><strong>{item.title}</strong><span>{item.summary || item.slug}</span></div></td><td>{item.category}</td><td><span className={`status-pill status-${(item.status || '').toLowerCase()}`}>{(item.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft'}</span></td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Not saved'}</td><td><div className="admin-table-actions"><Link className="admin-link-button" to={`admin_news_form?id=${encodeURIComponent(item.id)}`}>Edit</Link><Link className="admin-link-button" to={`news_detail?slug=${encodeURIComponent(item.slug)}&preview=1`}>View</Link><button className="admin-link-button" onClick={() => action(() => (item.status || '').toLowerCase() === 'published' ? unpublishNews(item.id) : publishNews(item.id))}>{(item.status || '').toLowerCase() === 'published' ? 'Unpublish' : 'Publish'}</button><button className="admin-link-button danger" onClick={() => { if (window.confirm('Delete this post?')) action(() => deleteNews(item.id)); }}>Delete</button></div></td></tr>)}</tbody></table></section></AdminShell>;
+}
+
+function AdminNewsForm() {
+  const params = new URLSearchParams(window.location.search);
+  const editId = params.get('id');
+  const [form, setForm] = useState({ title: '', slug: '', category: NEWS_CATEGORIES[0], image: NEWS_IMAGE_OPTIONS[0].value, summary: '', content: '', status: 'Draft' });
+  useEffect(() => { if (editId) getAdminNewsById(editId).then((post) => post && setForm({ ...form, ...post, status: (post.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft' })); }, [editId]);
+  function setField(key, value) {
+    setForm((current) => ({ ...current, [key]: value, ...(key === 'title' && !current.slug ? { slug: value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-') } : {}) }));
+  }
+  async function save(mode) {
+    const payload = { ...form, status: mode === 'publish' ? 'published' : 'draft' };
+    if (!payload.title || !payload.summary || !payload.content || !payload.slug) return window.alert('Please enter title, slug, summary, and full content.');
+    if (editId) await updateNews(editId, payload); else await createNews(payload);
+    navigate('admin_news');
+  }
+  return <AdminShell active="form"><div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>{editId ? 'Edit post' : 'Create post'}</h1></div><Link className="btn btn-outline" to="admin_news">Back to posts</Link></div><section className="admin-panel"><form className="admin-form"><label>Title<input value={form.title} onChange={(e) => setField('title', e.target.value)} /></label><label>Slug<input value={form.slug} onChange={(e) => setField('slug', e.target.value)} /></label><div className="grid-2"><label>Category<select value={form.category} onChange={(e) => setField('category', e.target.value)}>{NEWS_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label><label>Image<select value={form.image} onChange={(e) => setField('image', e.target.value)}>{NEWS_IMAGE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label></div><label>Status<select value={form.status} onChange={(e) => setField('status', e.target.value)}><option>Draft</option><option>Published</option></select></label><label>Summary<textarea value={form.summary} onChange={(e) => setField('summary', e.target.value)} /></label><label>Full content<textarea value={form.content} onChange={(e) => setField('content', e.target.value)} /></label><div className="section-actions"><button className="btn btn-outline" type="button" onClick={() => navigate('admin_news')}>Cancel</button><button className="btn btn-secondary" type="button" onClick={() => save('draft')}>Save draft</button><button className="btn btn-primary" type="button" onClick={() => save('publish')}>Publish</button></div></form></section></AdminShell>;
+}
+
+function PublicRoute({ route }) {
+  return <><Header route={route} /><main>{route === 'home' && <Home />}{route === 'about' && <About />}{route === 'academics' && <Academics />}{route === 'admissions' && <Admissions />}{route === 'contact' && <Contact />}{route === 'news' && <NewsList />}{route === 'news_detail' && <NewsDetail />}</main><Footer /></>;
+}
+
+function App() {
+  const [route, setRoute] = useState(routeFromLocation());
+  useEffect(() => {
+    const sync = () => setRoute(routeFromLocation());
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+  }, []);
+  useEffect(() => { document.title = 'Redeemers International School, Enugu'; }, [route]);
+  if (route === 'admin_login') return <AdminLogin />;
+  if (route === 'admin_news') return <AdminNews />;
+  if (route === 'admin_news_form') return <AdminNewsForm />;
+  return <PublicRoute route={route} />;
+}
+
+createRoot(document.getElementById('root')).render(<App />);
