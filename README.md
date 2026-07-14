@@ -48,11 +48,10 @@ Admin page:
 http://localhost/wins/redeemers/admin_login
 ```
 
-Default login:
+Before using the admin page, set an admin password hash in `api/config.php`.
 
-```txt
-username: admin
-password: admin123
+Generate a hash with:
+
+```bash
+php -r "echo password_hash('your_password_here', PASSWORD_BCRYPT);"
 ```
-
-Change the admin password before putting the site online.

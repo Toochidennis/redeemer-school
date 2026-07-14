@@ -2,16 +2,15 @@
 /**
  * Redeemers International School — API Configuration
  *
- * Change the admin credentials before production.
+ * Set the admin credentials before deployment.
  */
 
 // -------------------------------------------------------
 // Admin account (hardcoded for now)
 // -------------------------------------------------------
-// Generate a new hash with: php -r "echo password_hash('your_password', PASSWORD_BCRYPT);"
-// Change this password before production!
+// Generate a hash with: php -r "echo password_hash('your_password', PASSWORD_BCRYPT);"
 define('ADMIN_USERNAME', 'admin');
-define('ADMIN_PASSWORD_HASH', '$2y$12$jaOPSG/Du3aT5q8DIpVLfeH78S3vn7oH9LstKcdvELD38ojnDZUPq'); // admin123
+define('ADMIN_PASSWORD_HASH', '');
 
 // -------------------------------------------------------
 // Data file paths
