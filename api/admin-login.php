@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — Admin login endpoint
+ * Redeemers International Secondary School — Admin login endpoint
  *
  * POST /api/admin-login.php
  * Body: { "username": "...", "password": "..." }

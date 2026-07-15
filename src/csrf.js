@@ -1,5 +1,5 @@
 /**
- * Redeemers International School — CSRF helper for admin API calls.
+ * Redeemers International Secondary School — CSRF helper for admin API calls.
  *
  * Usage:
  *   const res = await csrfFetch('api/admin-news.php', { method: 'POST', body: JSON.stringify(payload) });

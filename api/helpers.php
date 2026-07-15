@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — API Helpers
+ * Redeemers International Secondary School — API Helpers
  */
 
 require_once __DIR__ . '/config.php';
@@ -145,8 +145,8 @@ function get_default_posts(): array {
             'title'     => 'Admission enquiries are open',
             'slug'      => 'admission-enquiries-open',
             'category'  => 'Admissions',
-            'summary'   => 'Parents and guardians can contact the school office for admission guidance and class placement support.',
-            'content'   => "Redeemers International School, Enugu welcomes admission enquiries from parents and guardians.\n\nThe admissions team guides families through class placement, entrance assessment information, and registration steps.",
+            'summary'   => 'Parents and guardians can contact the school office for admission guidance into Junior and Senior Secondary classes.',
+            'content'   => "Redeemers International Secondary School, Enugu welcomes admission enquiries from parents and guardians.\n\nThe admissions team guides families through class placement, entrance assessment information, and registration steps for Junior and Senior Secondary students.",
             'image'     => 'redeemers/optimized/campus.webp',
             'status'    => 'published',
             'createdAt' => '2026-07-14T10:00:00+01:00',
@@ -157,8 +157,8 @@ function get_default_posts(): array {
             'title'     => 'Learning in the classroom',
             'slug'      => 'learning-in-the-classroom',
             'category'  => 'Academics',
-            'summary'   => 'Classroom teaching remains central to the school’s academic structure and learner development.',
-            'content'   => "The classroom environment at Redeemers International School supports daily lessons, guided practice, assessment, and teacher attention.\n\nLearners are encouraged to build confidence, discipline, and steady academic habits.",
+            'summary'   => 'Classroom teaching remains central to academic excellence and learner development at RISE.',
+            'content'   => "The classroom environment at Redeemers International Secondary School supports daily lessons, guided practice, assessment, and teacher attention.\n\nLearners are encouraged to build confidence, discipline, and steady academic habits.",
             'image'     => 'redeemers/optimized/classroom.webp',
             'status'    => 'published',
             'createdAt' => '2026-07-14T10:00:00+01:00',
@@ -166,11 +166,11 @@ function get_default_posts(): array {
         ],
         [
             'id'        => 'news_1784020000003',
-            'title'     => 'Practical science learning',
-            'slug'      => 'practical-science-learning',
+            'title'     => 'Practical learning and student development',
+            'slug'      => 'practical-learning-and-student-development',
             'category'  => 'School Life',
-            'summary'   => 'Students are shown engaging with laboratory instruments and practical demonstrations.',
-            'content'   => "Students learn in a laboratory setting where practical exposure helps them connect classroom lessons with observation, handling of instruments, and guided demonstrations.",
+            'summary'   => 'RISE continues to develop academic, arts, and extra-curricular programmes that strengthen students.',
+            'content'   => "Students learn through classroom work, practical exposure, arts, and extra-curricular activities that support confidence, discipline, and strength of character.",
             'image'     => 'redeemers/optimized/laboratory.webp',
             'status'    => 'published',
             'createdAt' => '2026-07-14T10:00:00+01:00',
@@ -178,11 +178,11 @@ function get_default_posts(): array {
         ],
         [
             'id'        => 'news_1784020000004',
-            'title'     => 'Knowledge And Fear of The Lord',
-            'slug'      => 'knowledge-and-fear-of-the-lord',
+            'title'     => 'Knowledge and the fear of the Lord',
+            'slug'      => 'knowledge-and-the-fear-of-the-lord',
             'category'  => 'Notice',
-            'summary'   => 'The school motto is preserved as the guiding language for this new website.',
-            'content'   => "The Redeemers International School crest carries the motto “Knowledge And Fear of The Lord.”\n\nThe new website uses this language as a consistent expression of the school’s identity and values.",
+            'summary'   => 'The school motto remains central to the RISE identity and learning culture.',
+            'content'   => "Redeemers International Secondary School is guided by the motto “Knowledge and the fear of the Lord.”\n\nThis reflects the school’s commitment to academic excellence, faith, discipline, and sound moral values.",
             'image'     => 'redeemers/optimized/badge.webp',
             'status'    => 'published',
             'createdAt' => '2026-07-14T10:00:00+01:00',

@@ -1,5 +1,5 @@
 /**
- * Redeemers International School — Admin Auth
+ * Redeemers International Secondary School — Admin Auth
  *
  * Primary: PHP API (api/admin-login.php, api/admin-logout.php, api/admin-me.php)
  * Fallback: sessionStorage mock (for Vite dev without PHP)

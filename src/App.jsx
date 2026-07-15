@@ -16,6 +16,15 @@ import {
 import { getCurrentAdmin, login, logout } from './admin-auth.js';
 
 const ROUTES = ['about', 'academics', 'admissions', 'contact', 'news', 'news_detail', 'admin_login', 'admin_news', 'admin_news_form'];
+const SCHOOL = {
+  shortName: 'RISE',
+  name: 'Redeemers International Secondary School',
+  location: 'Emene, Enugu State, Nigeria',
+  address: '5 Destiny Layout, behind Herbatex Paint, by Old Airport Road, Enugu',
+  email: 'redeemersschoolenugu@gmail.com',
+  phones: ['07034513889', '08022470908', '07062340519'],
+  motto: 'Knowledge and the fear of the Lord.'
+};
 
 function routeFromLocation() {
   const parts = window.location.pathname.split('/').filter(Boolean);
@@ -60,8 +69,8 @@ function Header({ route }) {
     <header className="site-header">
       <div className="nav-wrap">
         <Link className="brand" to="./">
-          <img src="redeemers/optimized/badge.webp" alt="Redeemers International School crest" />
-          <span><strong>Redeemers International School</strong><span>Enugu</span></span>
+          <img src="redeemers/optimized/badge.webp" alt="Redeemers International Secondary School crest" />
+          <span><strong>{SCHOOL.name}</strong><span>Emene, Enugu</span></span>
         </Link>
         <button className="nav-toggle" type="button" aria-label="Open menu" aria-expanded={open} onClick={() => setOpen(!open)}>☰</button>
         <nav className={`site-nav${open ? ' is-open' : ''}`} id="site-nav" aria-label="Main navigation">
@@ -78,9 +87,9 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="footer-grid">
-        <div><img src="redeemers/optimized/badge.webp" alt="" /><strong>Redeemers International School, Enugu</strong><p>Knowledge And Fear of The Lord.</p></div>
+        <div><img src="redeemers/optimized/badge.webp" alt="" /><strong>{SCHOOL.name}</strong><p>{SCHOOL.motto}</p><p>{SCHOOL.address}</p></div>
         <div><strong>Pages</strong><Link to="./">Home</Link><Link to="about">About</Link><Link to="academics">Academics</Link><Link to="admissions">Admissions</Link><Link to="news">News</Link></div>
-        <div><strong>Admin</strong><Link to="admin_login">News login</Link><p>School updates are managed through the news desk.</p></div>
+        <div><strong>Contact</strong><a href={`mailto:${SCHOOL.email}`}>{SCHOOL.email}</a>{SCHOOL.phones.map((phone) => <a key={phone} href={`tel:${phone}`}>{phone}</a>)}<Link to="admin_login">News login</Link></div>
       </div>
     </footer>
   );
@@ -137,17 +146,17 @@ function Home() {
   return (
     <>
       <section className="hero">
-        <img className="hero-bg" src="redeemers/optimized/campus.webp" alt="Redeemers International School campus" />
+        <img className="hero-bg" src="redeemers/optimized/campus.webp" alt="Redeemers International Secondary School campus" />
         <div className="hero-inner">
           <span className="kicker">Rise with purpose</span>
-          <h1>Knowledge, character, and practical learning in Enugu.</h1>
-          <p>Redeemers International School brings classroom teaching, laboratory experience, and values-based formation into one focused school environment.</p>
+          <h1>Character-centered secondary education in Enugu.</h1>
+          <p>{SCHOOL.name} is an educational center for academic excellence, raising disciplined students through learning, faith, diligence, and strong moral values.</p>
           <div className="hero-actions"><Link className="btn btn-primary" to="admissions">Start admission enquiry</Link><Link className="btn btn-outline" to="academics">Explore academics</Link></div>
-          <div className="hero-strip"><div><strong>Enugu</strong><span>School location shown on the crest</span></div><div><strong>RISE</strong><span>A visible call within the school badge</span></div><div><strong>Faith & learning</strong><span>Knowledge And Fear of The Lord</span></div></div>
+          <div className="hero-strip"><div><strong>Emene</strong><span>Based in Enugu State, Nigeria</span></div><div><strong>RISE</strong><span>Redeemers International Secondary School</span></div><div><strong>Faith & learning</strong><span>{SCHOOL.motto}</span></div></div>
         </div>
       </section>
-      <section className="section"><div className="container"><SectionHead kicker="School Life" title="A school day built around attention and practice." text="Classrooms, science work, and guided practical learning are central to the school experience." /><div className="grid-3"><article className="card"><h3>Classroom focus</h3><p>Organized class settings for daily learning, assessment, and teacher-led support.</p></article><article className="card"><h3>Science exposure</h3><p>Learners engage with instruments, observation, and practical demonstrations.</p></article><article className="card"><h3>Character formation</h3><p>The school motto anchors learning in knowledge, discipline, reverence, and responsibility.</p></article></div></div></section>
-      <section className="section alt"><div className="container feature-layout"><div><span className="kicker">Why Redeemers</span><h2>Built for parents who want visible learning, not vague promises.</h2><ul className="rail-list"><li><strong>Structured academics</strong><br />Core classroom learning presented clearly for nursery, primary, and secondary prospects.</li><li><strong>Practical experiences</strong><br />Science and skills-based activities are part of the visual identity of the school.</li><li><strong>Faith-informed values</strong><br />The motto is preserved as a public signal of the school’s formation priorities.</li></ul></div><div className="image-panel"><img src="redeemers/optimized/laboratory.webp" alt="Students working in the school laboratory" /></div></div></section>
+      <section className="section"><div className="container"><SectionHead kicker="School Life" title="Junior and senior secondary learning with purpose." text="RISE serves students across two major class divisions: Junior Secondary and Senior Secondary." /><div className="grid-3"><article className="card"><h3>Academic excellence</h3><p>Students are guided through structured lessons, assessment, and teacher-led academic support.</p></article><article className="card"><h3>Arts and activities</h3><p>The school continues to develop arts and extra-curricular programmes that strengthen character and confidence.</p></article><article className="card"><h3>Character formation</h3><p>Faith, diligence, discipline, and hard work shape the school’s approach to secondary education.</p></article></div></div></section>
+      <section className="section alt"><div className="container feature-layout"><div><span className="kicker">Why RISE</span><h2>Partnership between church, home, and school.</h2><ul className="rail-list"><li><strong>Strong leaders</strong><br />The school works to produce strong and effective young leaders who can impact their homes and society.</li><li><strong>Excellence through diligence</strong><br />Students are encouraged to grow through hard work, discipline, and steady academic effort.</li><li><strong>University readiness</strong><br />RISE graduates are known for strong acceptance into local and foreign-based universities.</li></ul></div><div className="image-panel"><img src="redeemers/optimized/laboratory.webp" alt="Students working in the school laboratory" /></div></div></section>
       <section className="section"><div className="container"><SectionHead kicker="Latest" title="News and notices" text="Published posts from the school news desk appear here. The admin area can add, edit, publish, and remove updates." /><div className="grid-3">{posts.map((post) => <NewsCard key={post.id} post={post} />)}</div><div className="section-actions"><Link className="btn btn-secondary" to="news">View all news</Link></div></div></section>
       <section className="section dark"><div className="container gallery"><img src="redeemers/optimized/classroom.webp" alt="Students seated in class" /><img src="redeemers/optimized/practical-learning.webp" alt="Students observing practical work" /><img src="redeemers/optimized/excursion.webp" alt="Students on guided practical visit" /><img src="redeemers/optimized/skills-workshop.webp" alt="Students around workshop materials" /><img src="redeemers/optimized/school-block.webp" alt="School building exterior" /></div></section>
     </>
@@ -157,9 +166,9 @@ function Home() {
 function About() {
   return (
     <>
-      <PageHero kicker="About the school" title="Redeemers International School, Enugu" text="Redeemers International School is guided by the motto Knowledge And Fear of The Lord, with a learning environment shaped by academics, discipline, and practical development." image="redeemers/optimized/school-block.webp" alt="Redeemers school building exterior" />
-      <section className="section"><div className="container feature-layout about-identity"><div className="crest-panel"><img src="redeemers/optimized/badge.webp" alt="Redeemers International School badge" /></div><div><span className="kicker">Identity</span><h2>RISE is at the center of the crest.</h2><p>The crest combines an open book, dove, shield, and red ribbon. The design system uses those cues carefully: green for growth and institution, red for emphasis, and structured rails for order.</p><ul className="rail-list"><li><strong>School name</strong><br />Redeemers International School</li><li><strong>Location</strong><br />Enugu</li><li><strong>Motto</strong><br />Knowledge And Fear of The Lord</li></ul></div></div></section>
-      <section className="section alt"><div className="container"><SectionHead kicker="Campus" title="Real facilities lead the story." text="The school environment is presented through campus, classroom, and laboratory imagery." /><div className="grid-3"><article className="card"><h3>Campus</h3><p>Exterior photos present the school compound and building.</p></article><article className="card"><h3>Classrooms</h3><p>Class photos support the academic positioning of the site.</p></article><article className="card"><h3>Laboratory</h3><p>Science imagery helps communicate practical learning.</p></article></div></div></section>
+      <PageHero kicker="About the school" title={`${SCHOOL.name} (${SCHOOL.shortName})`} text="RISE is an educational center for academic excellence based in Emene, Enugu State, Nigeria." image="redeemers/optimized/school-block.webp" alt="Redeemers school building exterior" />
+      <section className="section"><div className="container feature-layout about-identity"><div className="crest-panel"><img src="redeemers/optimized/badge.webp" alt="Redeemers International Secondary School badge" /></div><div><span className="kicker">About Us</span><h2>Academic excellence with character at the center.</h2><p>Since inception, RISE has continued to develop academic, arts, and extra-curricular programmes that elevate students’ strength of character and prepare high-achieving individuals for Nigerian society.</p><p>RISE seeks to be the first choice for families in Enugu and environs who want a good character-centered secondary education for their children.</p><ul className="rail-list"><li><strong>Class divisions</strong><br />Junior Secondary and Senior Secondary</li><li><strong>Location</strong><br />{SCHOOL.location}</li><li><strong>Motto</strong><br />{SCHOOL.motto}</li></ul></div></div></section>
+      <section className="section alt"><div className="container"><SectionHead kicker="From the Principal's Desk" title="Welcome to Redeemers International Secondary School." text="A message from Mr. Ikechukwu Olodu, Principal." /><div className="grid-2"><article className="card"><p>It is with great joy and gratitude to God that I welcome you to our school community. At Redeemers International Secondary School, we are committed to nurturing young minds in an environment where academic excellence, the fear of God, and sound moral values are the pillars of education.</p><p>We believe that every child is created with unique gifts and limitless potential. Our mission is not only to help students achieve outstanding academic success but also to raise disciplined, responsible, and compassionate leaders who will make a positive impact in their families, communities, and the world.</p></article><article className="card"><p>Our dedicated and highly qualified staff are passionate about inspiring excellence, encouraging creativity, and developing character. Through quality teaching, spiritual guidance, and a culture of discipline and respect, we prepare our students to face the future with confidence, integrity, and wisdom.</p><p><strong>Mr. Ikechukwu Olodu</strong><br />Principal</p></article></div></div></section>
     </>
   );
 }
@@ -167,8 +176,8 @@ function About() {
 function Academics() {
   return (
     <>
-      <PageHero kicker="Academics" title="Learning with structure, practice, and values." text="The academic programme supports classroom learning, practical exposure, and steady learner development." image="redeemers/optimized/classroom.webp" alt="Students in a classroom" />
-      <section className="section"><div className="container"><SectionHead kicker="Programmes" title="Clear pathways for families to review." text="Learners are supported through foundational, primary, and secondary stages of development." /><div className="grid-3"><article className="program-card"><h3>Nursery</h3><p>Foundational literacy, numeracy, social habits, and guided early learning routines.</p></article><article className="program-card"><h3>Primary</h3><p>Core subjects, class projects, reading discipline, and steady academic development.</p></article><article className="program-card"><h3>Secondary</h3><p>Subject-based learning, science exposure, practical work, and examination readiness.</p></article></div></div></section>
+      <PageHero kicker="Academics" title="Learning with structure, practice, and values." text="The academic programme supports junior and senior secondary students through classroom learning, practical exposure, and steady learner development." image="redeemers/optimized/classroom.webp" alt="Students in a classroom" />
+      <section className="section"><div className="container"><SectionHead kicker="Programmes" title="Secondary education for character and excellence." text="RISE supports students through Junior Secondary and Senior Secondary class divisions." /><div className="grid-2"><article className="program-card"><h3>Junior Secondary</h3><p>Foundation-building classes that strengthen core subjects, discipline, confidence, and study habits.</p></article><article className="program-card"><h3>Senior Secondary</h3><p>Focused subject learning, examination preparation, leadership development, and university readiness.</p></article></div></div></section>
       <section className="section alt"><div className="container feature-layout"><div><span className="kicker">Practical learning</span><h2>Science and skill-based activities have a visible role.</h2><p>Students learn through observation, guided demonstrations, and hands-on academic experiences that support classroom teaching.</p><div className="section-actions"><Link className="btn btn-primary" to="admissions">Ask about admission</Link></div></div><div className="image-panel"><img src="redeemers/optimized/practical-learning.webp" alt="Students around practical learning equipment" /></div></div></section>
     </>
   );
@@ -177,7 +186,7 @@ function Academics() {
 function Admissions() {
   return (
     <>
-      <PageHero kicker="Admissions" title="Begin with a direct school enquiry." text="Families can start the admission process by contacting the school office and sharing the learner’s class level." image="redeemers/optimized/campus.webp" alt="Redeemers International School campus" />
+      <PageHero kicker="Admissions" title="Begin with a direct school enquiry." text="Families can start the admission process by contacting the school office and sharing the learner’s intended class level." image="redeemers/optimized/campus.webp" alt="Redeemers International Secondary School campus" />
       <section className="section"><div className="container"><SectionHead kicker="Process" title="A simple flow for prospective parents." text="The admissions team guides families from enquiry to registration." /><div className="grid-3"><article className="card"><h3>1. Make an enquiry</h3><p>Contact the school or use the form to indicate the class level and learner details.</p></article><article className="card"><h3>2. Visit or receive guidance</h3><p>The school shares form requirements, fee guidance, and assessment information.</p></article><article className="card"><h3>3. Complete registration</h3><p>Submit required documents and complete the school’s official registration process.</p></article></div></div></section>
       <section className="section alt"><div className="container contact-grid"><div className="contact-panel"><h2>Admissions office</h2><ul className="rail-list"><li>Admission enquiries</li><li>Class placement guidance</li><li>Entrance assessment information</li><li>Registration support</li></ul></div><ContactForm admission /></div></section>
     </>
@@ -187,8 +196,8 @@ function Admissions() {
 function Contact() {
   return (
     <>
-      <PageHero kicker="Contact" title="Reach the school office." text="Visit or contact Redeemers International School in Enugu for admissions, school visits, and general enquiries." image="redeemers/optimized/school-block.webp" alt="School exterior" />
-      <section className="section"><div className="container contact-grid"><div className="contact-panel"><h2>Redeemers International School</h2><ul className="rail-list"><li><strong>Location</strong><br />Enugu</li><li><strong>Motto</strong><br />Knowledge And Fear of The Lord</li><li><strong>Enquiries</strong><br />Admissions, academics, school visits, and general information</li></ul></div><ContactForm /></div></section>
+      <PageHero kicker="Contact" title="Reach the school office." text="Visit or contact Redeemers International Secondary School in Enugu for admissions, school visits, and general enquiries." image="redeemers/optimized/school-block.webp" alt="School exterior" />
+      <section className="section"><div className="container contact-grid"><div className="contact-panel"><h2>{SCHOOL.name}</h2><ul className="rail-list"><li><strong>Address</strong><br />{SCHOOL.address}</li><li><strong>Email</strong><br /><a href={`mailto:${SCHOOL.email}`}>{SCHOOL.email}</a></li><li><strong>Phone</strong><br />{SCHOOL.phones.map((phone, index) => <React.Fragment key={phone}><a href={`tel:${phone}`}>{phone}</a>{index < SCHOOL.phones.length - 1 ? ', ' : ''}</React.Fragment>)}</li><li><strong>Motto</strong><br />{SCHOOL.motto}</li></ul></div><ContactForm /></div></section>
     </>
   );
 }
@@ -218,7 +227,7 @@ function NewsDetail() {
       setPost(item);
       const items = await getPublicNews();
       setRelated(items.filter((entry) => entry.slug !== slug).slice(0, 3));
-      if (item) document.title = `${item.title} | Redeemers International School`;
+      if (item) document.title = `${item.title} | Redeemers International Secondary School`;
     }
     load();
   }, [slug]);
@@ -241,14 +250,14 @@ function AdminLogin() {
     if (!result.ok) return setMessage(result.message);
     navigate('admin_news');
   }
-  return <main className="admin-login"><form className="admin-login-card form-grid" onSubmit={submit}><img src="redeemers/optimized/badge.webp" alt="Redeemers International School crest" /><div><span className="kicker">News admin</span><h1>Sign in</h1></div><label>Username<input name="username" autoComplete="username" required /></label><label>Password<input name="password" type="password" autoComplete="current-password" required /></label><button className="btn btn-primary" type="submit">Sign in</button><p className="admin-message">{message}</p><Link to="./">Back to site</Link></form></main>;
+  return <main className="admin-login"><form className="admin-login-card form-grid" onSubmit={submit}><img src="redeemers/optimized/badge.webp" alt="Redeemers International Secondary School crest" /><div><span className="kicker">News admin</span><h1>Sign in</h1></div><label>Username<input name="username" autoComplete="username" required /></label><label>Password<input name="password" type="password" autoComplete="current-password" required /></label><button className="btn btn-primary" type="submit">Sign in</button><p className="admin-message">{message}</p><Link to="./">Back to site</Link></form></main>;
 }
 
 function AdminShell({ children, active }) {
   const [admin, setAdmin] = useState(null);
   useEffect(() => { getCurrentAdmin().then((user) => { if (!user) navigate('admin_login'); else setAdmin(user); }); }, []);
   if (!admin) return null;
-  return <div className="admin-shell"><aside className="admin-sidebar"><img src="redeemers/optimized/badge.webp" alt="Redeemers International School crest" /><strong>Redeemers Admin</strong><p>{admin.name || admin.username}</p><nav className="admin-nav"><Link className={active === 'news' ? 'is-active' : ''} to="admin_news">News posts</Link><Link className={active === 'form' ? 'is-active' : ''} to="admin_news_form">Create post</Link><Link to="./">View site</Link><button type="button" onClick={async () => { await logout(); navigate('admin_login'); }}>Sign out</button></nav></aside><main className="admin-main">{children}</main></div>;
+  return <div className="admin-shell"><aside className="admin-sidebar"><img src="redeemers/optimized/badge.webp" alt="Redeemers International Secondary School crest" /><strong>Redeemers Admin</strong><p>{admin.name || admin.username}</p><nav className="admin-nav"><Link className={active === 'news' ? 'is-active' : ''} to="admin_news">News posts</Link><Link className={active === 'form' ? 'is-active' : ''} to="admin_news_form">Create post</Link><Link to="./">View site</Link><button type="button" onClick={async () => { await logout(); navigate('admin_login'); }}>Sign out</button></nav></aside><main className="admin-main">{children}</main></div>;
 }
 
 function AdminNews() {
@@ -294,7 +303,7 @@ function App() {
     window.addEventListener('popstate', sync);
     return () => window.removeEventListener('popstate', sync);
   }, []);
-  useEffect(() => { document.title = 'Redeemers International School, Enugu'; }, [route]);
+  useEffect(() => { document.title = 'Redeemers International Secondary School, Enugu'; }, [route]);
   if (route === 'admin_login') return <AdminLogin />;
   if (route === 'admin_news') return <AdminNews />;
   if (route === 'admin_news_form') return <AdminNewsForm />;

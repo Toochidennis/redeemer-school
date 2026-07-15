@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — Admin logout endpoint
+ * Redeemers International Secondary School — Admin logout endpoint
  *
  * POST /api/admin-logout.php
  */

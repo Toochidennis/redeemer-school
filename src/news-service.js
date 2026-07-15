@@ -1,5 +1,5 @@
 /**
- * Redeemers International School — News Service
+ * Redeemers International Secondary School — News Service
  *
  * Primary: PHP API (api/news.php, api/admin-news.php)
  * Fallback: localStorage (for Vite dev without PHP)

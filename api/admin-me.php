@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — Admin me endpoint
+ * Redeemers International Secondary School — Admin me endpoint
  *
  * GET /api/admin-me.php
  * Returns the currently logged-in admin, or 401.

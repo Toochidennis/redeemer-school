@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — Public news endpoint
+ * Redeemers International Secondary School — Public news endpoint
  *
  * GET /api/news.php              — all published news, newest first
  * GET /api/news.php?slug=<slug>  — single published post

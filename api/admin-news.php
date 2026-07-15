@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — Admin news CRUD endpoint
+ * Redeemers International Secondary School — Admin news CRUD endpoint
  *
  * GET    /api/admin-news.php                        — all news (draft + published)
  * GET    /api/admin-news.php?id=<id>                — single post

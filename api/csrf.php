@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — CSRF token endpoint
+ * Redeemers International Secondary School — CSRF token endpoint
  *
  * GET /api/csrf.php
  * Returns a CSRF token for the authenticated admin.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Redeemers International School — API Configuration
+ * Redeemers International Secondary School — API Configuration
  *
  * Set the admin credentials before deployment.
  */
