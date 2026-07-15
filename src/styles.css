@@ -227,6 +227,10 @@ h3 { font-size: 1.18rem; }
   gap: 24px;
 }
 
+.values-grid {
+  margin-top: 18px;
+}
+
 .card, .program-card, .news-card, .admin-panel, .contact-panel {
   background: var(--white);
   border: 1px solid var(--line);
