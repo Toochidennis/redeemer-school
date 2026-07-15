@@ -28,6 +28,7 @@ const SCHOOL = {
   vision: 'To raise godly, disciplined, and academically excellent students who will impact their generation.',
   mission: 'To provide holistic education through sound academics, Christian values, discipline, and character development in a safe and supportive learning environment.'
 };
+const WHATSAPP_NUMBER = '2348022470908';
 
 function routeFromLocation() {
   const parts = window.location.pathname.split('/').filter(Boolean);
@@ -129,7 +130,23 @@ function ContactForm({ admission = false }) {
   const [message, setMessage] = useState('');
   function submit(event) {
     event.preventDefault();
-    setMessage('Thank you. The school office will review your enquiry.');
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get('name') || '').trim();
+    const contact = String(form.get('contact') || '').trim();
+    const classLevel = String(form.get('class') || '').trim();
+    const subject = String(form.get('subject') || '').trim();
+    const note = String(form.get('message') || '').trim();
+    const lines = [
+      admission ? 'Admission enquiry from the website' : 'Contact message from the website',
+      '',
+      `Name: ${name}`,
+      `Contact: ${contact}`
+    ];
+    if (admission && classLevel) lines.push(`Class of interest: ${classLevel}`);
+    if (!admission && subject) lines.push(`Subject: ${subject}`);
+    if (note) lines.push('', 'Message:', note);
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener,noreferrer');
+    setMessage('WhatsApp is opening with your enquiry.');
     event.currentTarget.reset();
   }
   return (
