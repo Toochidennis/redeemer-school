@@ -392,18 +392,6 @@ input, textarea, select {
   background: var(--white);
 }
 textarea { min-height: 150px; resize: vertical; }
-.form-trap {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
 
 .form-message {
   margin: 0;
@@ -411,7 +399,6 @@ textarea { min-height: 150px; resize: vertical; }
 }
 
 .form-message.success { color: var(--green); }
-.form-message.error { color: #b42318; }
 
 .site-footer {
   background: #071d16;

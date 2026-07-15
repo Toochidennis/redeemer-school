@@ -127,39 +127,10 @@ function NewsCard({ post }) {
 
 function ContactForm({ admission = false }) {
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState('');
-  const [sending, setSending] = useState(false);
-  async function submit(event) {
+  function submit(event) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const payload = {
-      type: admission ? 'admission' : 'contact',
-      name: form.get('name'),
-      contact: form.get('contact'),
-      classLevel: form.get('class'),
-      subject: form.get('subject'),
-      message: form.get('message'),
-      website: form.get('website')
-    };
-    setSending(true);
-    setStatus('');
-    setMessage('Sending...');
-    try {
-      const response = await fetch('api/contact.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json().catch(() => ({}));
-      setStatus(response.ok && result.success ? 'success' : 'error');
-      setMessage(result.message || (response.ok ? 'Thank you. The school office will review your enquiry.' : 'The message could not be sent right now.'));
-      if (response.ok && result.success) event.currentTarget.reset();
-    } catch {
-      setStatus('error');
-      setMessage('The message could not be sent right now. Please call or email the school directly.');
-    } finally {
-      setSending(false);
-    }
+    setMessage('Thank you. The school office will review your enquiry.');
+    event.currentTarget.reset();
   }
   return (
     <form className="contact-panel form-grid" onSubmit={submit}>
@@ -167,9 +138,8 @@ function ContactForm({ admission = false }) {
       <label>{admission ? 'Phone or email' : 'Email or phone'}<input name="contact" required /></label>
       {admission ? <label>Class of interest<input name="class" /></label> : <label>Subject<input name="subject" /></label>}
       <label>Message<textarea name="message" required={!admission}></textarea></label>
-      <label className="form-trap">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
-      <button className="btn btn-primary" type="submit" disabled={sending}>{sending ? 'Sending...' : admission ? 'Send enquiry' : 'Send message'}</button>
-      {message && <p className={`form-message ${status}`}>{message}</p>}
+      <button className="btn btn-primary" type="submit">{admission ? 'Send enquiry' : 'Send message'}</button>
+      {message && <p className="form-message success">{message}</p>}
     </form>
   );
 }
