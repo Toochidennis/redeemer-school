@@ -1,24 +1,13 @@
-/**
- * Redeemers International Secondary School — Admin Auth
- *
- * Primary: PHP API (api/admin-login.php, api/admin-logout.php, api/admin-me.php)
- * Fallback: sessionStorage mock (for Vite dev without PHP)
- */
-
 import { clearCsrfToken } from './csrf.js';
 
 const ADMIN_SESSION_KEY = 'redeemers_admin_session_v1';
 
-// -------------------------------------------------------
-// API mode detection
-// -------------------------------------------------------
 let apiAvailable = null;
 
 async function isApiAvailable() {
   if (apiAvailable !== null) return apiAvailable;
   try {
     const res = await fetch('api/admin-me.php', { credentials: 'include' });
-    // 200 or 401 both mean the PHP backend exists
     apiAvailable = res.ok || res.status === 401;
   } catch {
     apiAvailable = false;
@@ -26,9 +15,6 @@ async function isApiAvailable() {
   return apiAvailable;
 }
 
-// -------------------------------------------------------
-// Login
-// -------------------------------------------------------
 export async function login(username, password) {
   if (await isApiAvailable()) {
     try {
@@ -48,12 +34,9 @@ export async function login(username, password) {
     }
   }
 
-  return { ok: false, message: 'Admin login requires the PHP backend.' };
+  return { ok: false, message: 'Admin login is unavailable right now.' };
 }
 
-// -------------------------------------------------------
-// Logout
-// -------------------------------------------------------
 export async function logout() {
   clearCsrfToken();
 
@@ -66,9 +49,6 @@ export async function logout() {
   sessionStorage.removeItem(ADMIN_SESSION_KEY);
 }
 
-// -------------------------------------------------------
-// Get current admin
-// -------------------------------------------------------
 export async function getCurrentAdmin() {
   if (await isApiAvailable()) {
     try {
@@ -81,7 +61,6 @@ export async function getCurrentAdmin() {
     return null;
   }
 
-  // sessionStorage mock fallback
   try {
     const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
     if (!raw) return null;
@@ -93,9 +72,6 @@ export async function getCurrentAdmin() {
   }
 }
 
-// -------------------------------------------------------
-// Require admin (redirects if not logged in)
-// -------------------------------------------------------
 export async function requireAdmin() {
   const admin = await getCurrentAdmin();
   if (!admin) {
