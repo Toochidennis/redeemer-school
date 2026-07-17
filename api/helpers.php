@@ -146,54 +146,5 @@ function new_news_id(): string {
 }
 
 function get_default_posts(): array {
-    return [
-        [
-            'id'        => 'news_1784020000001',
-            'title'     => 'Admission enquiries are open',
-            'slug'      => 'admission-enquiries-open',
-            'category'  => 'Admissions',
-            'summary'   => 'Parents and guardians can contact the school office for admission guidance into Junior and Senior Secondary classes.',
-            'content'   => "Redeemers International Secondary School, Enugu welcomes admission enquiries from parents and guardians.\n\nThe admissions team guides families through class placement, entrance assessment information, and registration steps for Junior and Senior Secondary students.",
-            'image'     => 'redeemers/optimized/campus.webp',
-            'status'    => 'published',
-            'createdAt' => '2026-07-14T10:00:00+01:00',
-            'updatedAt' => '2026-07-14T10:00:00+01:00',
-        ],
-        [
-            'id'        => 'news_1784020000002',
-            'title'     => 'Learning in the classroom',
-            'slug'      => 'learning-in-the-classroom',
-            'category'  => 'Academics',
-            'summary'   => 'Classroom teaching remains central to academic excellence and learner development at RISE.',
-            'content'   => "The classroom environment at Redeemers International Secondary School supports daily lessons, guided practice, assessment, and teacher attention.\n\nLearners are encouraged to build confidence, discipline, and steady academic habits.",
-            'image'     => 'redeemers/optimized/classroom.webp',
-            'status'    => 'published',
-            'createdAt' => '2026-07-14T10:00:00+01:00',
-            'updatedAt' => '2026-07-14T10:00:00+01:00',
-        ],
-        [
-            'id'        => 'news_1784020000003',
-            'title'     => 'Practical learning and student development',
-            'slug'      => 'practical-learning-and-student-development',
-            'category'  => 'School Life',
-            'summary'   => 'RISE continues to develop academic, arts, and extra-curricular programmes that strengthen students.',
-            'content'   => "Students learn through classroom work, practical exposure, arts, and extra-curricular activities that support confidence, discipline, and strength of character.",
-            'image'     => 'redeemers/optimized/laboratory.webp',
-            'status'    => 'published',
-            'createdAt' => '2026-07-14T10:00:00+01:00',
-            'updatedAt' => '2026-07-14T10:00:00+01:00',
-        ],
-        [
-            'id'        => 'news_1784020000004',
-            'title'     => 'Knowledge and the fear of the Lord',
-            'slug'      => 'knowledge-and-the-fear-of-the-lord',
-            'category'  => 'Notice',
-            'summary'   => 'The school motto remains central to the RISE identity and learning culture.',
-            'content'   => "Redeemers International Secondary School is guided by the motto “Knowledge and the fear of the Lord.”\n\nThis reflects the school’s commitment to academic excellence, faith, discipline, and sound moral values.",
-            'image'     => 'redeemers/optimized/badge.webp',
-            'status'    => 'published',
-            'createdAt' => '2026-07-14T10:00:00+01:00',
-            'updatedAt' => '2026-07-14T10:00:00+01:00',
-        ],
-    ];
+    return [];
 }
