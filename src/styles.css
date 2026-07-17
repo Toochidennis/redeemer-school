@@ -754,6 +754,11 @@ textarea { min-height: 150px; resize: vertical; }
   background: #effaf3;
   color: #0d5f35;
 }
+.admin-alert.info {
+  border-color: #b7d8f5;
+  background: #f0f7ff;
+  color: #164a7a;
+}
 .admin-modal-backdrop {
   position: fixed;
   inset: 0;

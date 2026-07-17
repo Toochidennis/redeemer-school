@@ -301,10 +301,11 @@ function NewsPostPreview({ post }) {
 
 function AdminAlert({ message, type = 'error', onClose }) {
   if (!message) return null;
+  const label = type === 'success' ? 'Done' : type === 'info' ? 'Notice' : 'Please check this';
   return (
     <div className={`admin-alert ${type}`} role="alert">
       <div>
-        <strong>{type === 'success' ? 'Done' : 'Please check this'}</strong>
+        <strong>{label}</strong>
         <p>{message}</p>
       </div>
       {onClose && <button type="button" onClick={onClose} aria-label="Dismiss message">Close</button>}
@@ -412,7 +413,7 @@ function AdminNews() {
     <AdminShell active="news">
       <div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>Manage posts</h1></div><Link className="btn btn-primary" to="admin_news_form">Create post</Link></div>
       <section className="admin-panel">
-        {!NEWS_PUBLIC_LIVE && <AdminAlert message="The public news page is hidden. Ready posts stay in admin until the news page is opened." type="success" />}
+        {!NEWS_PUBLIC_LIVE && <AdminAlert message="The public news page is hidden. Ready posts stay in admin until the news page is opened." type="info" />}
         <AdminAlert message={message} type={messageType} onClose={() => setMessage('')} />
         <div className="admin-toolbar"><label className="admin-search-label">Search posts<input type="search" value={query} onChange={(e) => setQuery(e.target.value)} /></label><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option><option value="published">{publishedLabel}</option><option value="draft">Draft</option></select></div>
         <table className="admin-table"><thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{rows.length === 0 && <tr><td colSpan="5"><div className="admin-empty-state"><strong>No posts yet</strong><span>Use Create post to add one.</span></div></td></tr>}{rows.map((item) => <tr key={item.id}><td><div className="admin-post-cell"><strong>{item.title}</strong><span>{item.summary || item.slug}</span></div></td><td>{item.category}</td><td><span className={`status-pill status-${statusClass(item)}`}>{statusLabel(item)}</span></td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Not saved'}</td><td><div className="admin-table-actions"><Link className="admin-link-button" to={`admin_news_form?id=${encodeURIComponent(item.id)}`}>Edit</Link><Link className="admin-link-button" to={`news_detail?slug=${encodeURIComponent(item.slug)}&preview=1`}>Preview</Link><button className="admin-link-button" onClick={() => action(() => (item.status || '').toLowerCase() === 'published' ? unpublishNews(item.id) : publishNews(item.id), (item.status || '').toLowerCase() === 'published' ? `"${item.title}" has been moved back to draft.` : `"${item.title}" is ready.`)}>{(item.status || '').toLowerCase() === 'published' ? 'Move to draft' : 'Mark ready'}</button><button className="admin-link-button danger" onClick={() => setPendingDelete(item)}>Delete</button></div></td></tr>)}</tbody></table>
@@ -533,7 +534,7 @@ function AdminNewsForm() {
         <Link className="btn btn-outline" to="admin_news">Back to posts</Link>
       </div>
       <section className="admin-panel">
-        {!NEWS_PUBLIC_LIVE && <AdminAlert message="The public news page is hidden. Mark ready keeps this post in admin until the news page is opened." type="success" />}
+        {!NEWS_PUBLIC_LIVE && <AdminAlert message="The public news page is hidden. Mark ready keeps this post in admin until the news page is opened." type="info" />}
         <form className="admin-form admin-editor">
           <div className="admin-editor-main">
             <label>Title<input value={form.title} onChange={(e) => setField('title', e.target.value)} /></label>
