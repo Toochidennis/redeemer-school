@@ -1,7 +1,5 @@
 import { clearCsrfToken } from './csrf.js';
 
-const ADMIN_SESSION_KEY = 'redeemers_admin_session_v1';
-
 let apiAvailable = null;
 let cachedAdmin = null;
 
@@ -48,8 +46,6 @@ export async function logout() {
       await fetch('api/admin-logout.php', { method: 'POST', credentials: 'include' });
     } catch { /* ok */ }
   }
-
-  sessionStorage.removeItem(ADMIN_SESSION_KEY);
 }
 
 export async function getCurrentAdmin() {
@@ -66,17 +62,7 @@ export async function getCurrentAdmin() {
     } catch { /* fall through */ }
     return null;
   }
-
-  try {
-    const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed?.token || !parsed?.user) return null;
-    cachedAdmin = parsed.user;
-    return parsed.user;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export async function requireAdmin() {
