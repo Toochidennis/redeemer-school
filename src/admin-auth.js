@@ -3,6 +3,7 @@ import { clearCsrfToken } from './csrf.js';
 const ADMIN_SESSION_KEY = 'redeemers_admin_session_v1';
 
 let apiAvailable = null;
+let cachedAdmin = null;
 
 async function isApiAvailable() {
   if (apiAvailable !== null) return apiAvailable;
@@ -26,6 +27,7 @@ export async function login(username, password) {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        cachedAdmin = data.admin || { username };
         return { ok: true, session: { user: data.admin } };
       }
       return { ok: false, message: data.message || 'Invalid credentials.' };
@@ -39,6 +41,7 @@ export async function login(username, password) {
 
 export async function logout() {
   clearCsrfToken();
+  cachedAdmin = null;
 
   if (await isApiAvailable()) {
     try {
@@ -50,12 +53,15 @@ export async function logout() {
 }
 
 export async function getCurrentAdmin() {
+  if (cachedAdmin) return cachedAdmin;
+
   if (await isApiAvailable()) {
     try {
       const res = await fetch('api/admin-me.php', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
-        return data.admin || null;
+        cachedAdmin = data.admin || null;
+        return cachedAdmin;
       }
     } catch { /* fall through */ }
     return null;
@@ -66,6 +72,7 @@ export async function getCurrentAdmin() {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed?.token || !parsed?.user) return null;
+    cachedAdmin = parsed.user;
     return parsed.user;
   } catch {
     return null;
