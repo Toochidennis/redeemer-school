@@ -291,6 +291,22 @@ function AdminAlert({ message, type = 'error', onClose }) {
   );
 }
 
+function ConfirmDialog({ open, title, message, confirmLabel = 'Continue', onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="admin-modal-backdrop" role="presentation">
+      <section className="admin-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <h2 id="confirm-title">{title}</h2>
+        <p>{message}</p>
+        <div className="admin-confirm-actions">
+          <button className="btn btn-outline" type="button" onClick={onCancel}>Cancel</button>
+          <button className="btn btn-danger" type="button" onClick={onConfirm}>{confirmLabel}</button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function NewsDetail() {
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
@@ -338,6 +354,9 @@ function AdminNews() {
   const [posts, setPosts] = useState([]);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('success');
+  const [pendingDelete, setPendingDelete] = useState(null);
   async function reload() { setPosts(await getAdminNews()); }
   useEffect(() => { reload(); }, []);
   const rows = posts.filter((item) => {
@@ -345,8 +364,34 @@ function AdminNews() {
     const itemStatus = (item.status || '').toLowerCase();
     return text.includes(query.toLowerCase()) && (status === 'all' || itemStatus === status.toLowerCase());
   });
-  async function action(fn) { await fn(); await reload(); }
-  return <AdminShell active="news"><div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>Manage posts</h1></div><Link className="btn btn-primary" to="admin_news_form">Create post</Link></div><section className="admin-panel"><div className="admin-toolbar"><label className="admin-search-label">Search posts<input type="search" value={query} onChange={(e) => setQuery(e.target.value)} /></label><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option></select></div><table className="admin-table"><thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{rows.map((item) => <tr key={item.id}><td><div className="admin-post-cell"><strong>{item.title}</strong><span>{item.summary || item.slug}</span></div></td><td>{item.category}</td><td><span className={`status-pill status-${(item.status || '').toLowerCase()}`}>{(item.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft'}</span></td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Not saved'}</td><td><div className="admin-table-actions"><Link className="admin-link-button" to={`admin_news_form?id=${encodeURIComponent(item.id)}`}>Edit</Link><Link className="admin-link-button" to={`news_detail?slug=${encodeURIComponent(item.slug)}&preview=1`}>View</Link><button className="admin-link-button" onClick={() => action(() => (item.status || '').toLowerCase() === 'published' ? unpublishNews(item.id) : publishNews(item.id))}>{(item.status || '').toLowerCase() === 'published' ? 'Unpublish' : 'Publish'}</button><button className="admin-link-button danger" onClick={() => { if (window.confirm('Delete this post?')) action(() => deleteNews(item.id)); }}>Delete</button></div></td></tr>)}</tbody></table></section></AdminShell>;
+  async function action(fn, successMessage) {
+    try {
+      await fn();
+      await reload();
+      setMessageType('success');
+      setMessage(successMessage);
+    } catch {
+      setMessageType('error');
+      setMessage('The action could not be completed. Please try again.');
+    }
+  }
+  async function confirmDelete() {
+    if (!pendingDelete) return;
+    const item = pendingDelete;
+    setPendingDelete(null);
+    await action(() => deleteNews(item.id), `"${item.title}" has been deleted.`);
+  }
+  return (
+    <AdminShell active="news">
+      <div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>Manage posts</h1></div><Link className="btn btn-primary" to="admin_news_form">Create post</Link></div>
+      <section className="admin-panel">
+        <AdminAlert message={message} type={messageType} onClose={() => setMessage('')} />
+        <div className="admin-toolbar"><label className="admin-search-label">Search posts<input type="search" value={query} onChange={(e) => setQuery(e.target.value)} /></label><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option></select></div>
+        <table className="admin-table"><thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{rows.map((item) => <tr key={item.id}><td><div className="admin-post-cell"><strong>{item.title}</strong><span>{item.summary || item.slug}</span></div></td><td>{item.category}</td><td><span className={`status-pill status-${(item.status || '').toLowerCase()}`}>{(item.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft'}</span></td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Not saved'}</td><td><div className="admin-table-actions"><Link className="admin-link-button" to={`admin_news_form?id=${encodeURIComponent(item.id)}`}>Edit</Link><Link className="admin-link-button" to={`news_detail?slug=${encodeURIComponent(item.slug)}&preview=1`}>View</Link><button className="admin-link-button" onClick={() => action(() => (item.status || '').toLowerCase() === 'published' ? unpublishNews(item.id) : publishNews(item.id), (item.status || '').toLowerCase() === 'published' ? `"${item.title}" has been unpublished.` : `"${item.title}" has been published.`)}>{(item.status || '').toLowerCase() === 'published' ? 'Unpublish' : 'Publish'}</button><button className="admin-link-button danger" onClick={() => setPendingDelete(item)}>Delete</button></div></td></tr>)}</tbody></table>
+      </section>
+      <ConfirmDialog open={Boolean(pendingDelete)} title="Delete this post?" message={pendingDelete ? `This will permanently remove "${pendingDelete.title}" from the news list.` : ''} confirmLabel="Delete post" onCancel={() => setPendingDelete(null)} onConfirm={confirmDelete} />
+    </AdminShell>
+  );
 }
 
 function AdminNewsForm() {

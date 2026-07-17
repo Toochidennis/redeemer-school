@@ -414,6 +414,10 @@ textarea { min-height: 150px; resize: vertical; }
   cursor: not-allowed;
   opacity: 0.65;
 }
+.btn-danger {
+  background: #b42318;
+  color: var(--white);
+}
 
 .form-message {
   margin: 0;
@@ -634,6 +638,35 @@ textarea { min-height: 150px; resize: vertical; }
   border-color: #a8dfb9;
   background: #effaf3;
   color: #0d5f35;
+}
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(7, 29, 22, 0.58);
+}
+.admin-confirm-dialog {
+  width: min(430px, 100%);
+  border-radius: var(--radius);
+  background: var(--white);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.admin-confirm-dialog h2 {
+  font-size: 1.6rem;
+}
+.admin-confirm-dialog p {
+  color: var(--muted);
+}
+.admin-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
 }
 .admin-login { min-height: 100vh; display: grid; place-items: center; padding: 22px; background: var(--deep); }
 .admin-login-card { width: min(440px, 100%); background: var(--white); padding: 30px; border-radius: var(--radius); }
