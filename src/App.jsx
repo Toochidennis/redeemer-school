@@ -10,6 +10,7 @@ import {
   getNewsBySlug,
   getPublicNews,
   publishNews,
+  uploadNewsImage,
   unpublishNews,
   updateNews
 } from './news-service.js';
@@ -302,9 +303,37 @@ function AdminNewsForm() {
   const params = new URLSearchParams(window.location.search);
   const editId = params.get('id');
   const [form, setForm] = useState({ title: '', slug: '', category: NEWS_CATEGORIES[0], image: NEWS_IMAGE_OPTIONS[0].value, summary: '', content: '', status: 'Draft' });
-  useEffect(() => { if (editId) getAdminNewsById(editId).then((post) => post && setForm({ ...form, ...post, status: (post.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft' })); }, [editId]);
+  const [uploading, setUploading] = useState(false);
+  const [formMessage, setFormMessage] = useState('');
+  useEffect(() => {
+    if (editId) {
+      getAdminNewsById(editId).then((post) => post && setForm((current) => ({ ...current, ...post, status: (post.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft' })));
+    }
+  }, [editId]);
   function setField(key, value) {
     setForm((current) => ({ ...current, [key]: value, ...(key === 'title' && !current.slug ? { slug: value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-') } : {}) }));
+  }
+  async function handleImageUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setFormMessage('Please choose a valid image file.');
+      return;
+    }
+    setUploading(true);
+    setFormMessage('Uploading image...');
+    try {
+      const image = await uploadNewsImage(file);
+      if (image) {
+        setField('image', image);
+        setFormMessage('Image uploaded and selected.');
+      }
+    } catch (error) {
+      setFormMessage(error.message || 'Image upload failed.');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
   }
   async function save(mode) {
     const payload = { ...form, status: mode === 'publish' ? 'published' : 'draft' };
@@ -312,7 +341,42 @@ function AdminNewsForm() {
     if (editId) await updateNews(editId, payload); else await createNews(payload);
     navigate('admin_news');
   }
-  return <AdminShell active="form"><div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>{editId ? 'Edit post' : 'Create post'}</h1></div><Link className="btn btn-outline" to="admin_news">Back to posts</Link></div><section className="admin-panel"><form className="admin-form"><label>Title<input value={form.title} onChange={(e) => setField('title', e.target.value)} /></label><label>Slug<input value={form.slug} onChange={(e) => setField('slug', e.target.value)} /></label><div className="grid-2"><label>Category<select value={form.category} onChange={(e) => setField('category', e.target.value)}>{NEWS_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label><label>Image<select value={form.image} onChange={(e) => setField('image', e.target.value)}>{NEWS_IMAGE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label></div><label>Status<select value={form.status} onChange={(e) => setField('status', e.target.value)}><option>Draft</option><option>Published</option></select></label><label>Summary<textarea value={form.summary} onChange={(e) => setField('summary', e.target.value)} /></label><label>Full content<textarea value={form.content} onChange={(e) => setField('content', e.target.value)} /></label><div className="section-actions"><button className="btn btn-outline" type="button" onClick={() => navigate('admin_news')}>Cancel</button><button className="btn btn-secondary" type="button" onClick={() => save('draft')}>Save draft</button><button className="btn btn-primary" type="button" onClick={() => save('publish')}>Publish</button></div></form></section></AdminShell>;
+  return (
+    <AdminShell active="form">
+      <div className="admin-toolbar">
+        <div><span className="kicker">News desk</span><h1>{editId ? 'Edit post' : 'Create post'}</h1></div>
+        <Link className="btn btn-outline" to="admin_news">Back to posts</Link>
+      </div>
+      <section className="admin-panel">
+        <form className="admin-form admin-editor">
+          <div className="admin-editor-main">
+            <label>Title<input value={form.title} onChange={(e) => setField('title', e.target.value)} /></label>
+            <label>Slug<input value={form.slug} onChange={(e) => setField('slug', e.target.value)} /></label>
+            <div className="grid-2">
+              <label>Category<select value={form.category} onChange={(e) => setField('category', e.target.value)}>{NEWS_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
+              <label>Status<select value={form.status} onChange={(e) => setField('status', e.target.value)}><option>Draft</option><option>Published</option></select></label>
+            </div>
+            <label>Summary<textarea className="summary-field" value={form.summary} onChange={(e) => setField('summary', e.target.value)} /></label>
+            <label>Full content<textarea className="content-field" value={form.content} onChange={(e) => setField('content', e.target.value)} /></label>
+          </div>
+          <aside className="admin-editor-side">
+            <div className="image-editor-preview">
+              <img src={form.image || NEWS_IMAGE_OPTIONS[0].value} alt={form.title || 'News preview'} />
+            </div>
+            <label>Upload image<input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} /></label>
+            <label>Or choose existing image<select value={form.image} onChange={(e) => setField('image', e.target.value)}>{NEWS_IMAGE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}{form.image && !NEWS_IMAGE_OPTIONS.some((item) => item.value === form.image) && <option value={form.image}>Uploaded image</option>}</select></label>
+            <p className="admin-help">Uploaded images are saved with the news post and used on the news card and detail page.</p>
+            {formMessage && <p className="admin-message">{formMessage}</p>}
+            <div className="section-actions admin-editor-actions">
+              <button className="btn btn-outline" type="button" onClick={() => navigate('admin_news')}>Cancel</button>
+              <button className="btn btn-secondary" type="button" onClick={() => save('draft')} disabled={uploading}>Save draft</button>
+              <button className="btn btn-primary" type="button" onClick={() => save('publish')} disabled={uploading}>Publish</button>
+            </div>
+          </aside>
+        </form>
+      </section>
+    </AdminShell>
+  );
 }
 
 function PublicRoute({ route }) {

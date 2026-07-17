@@ -209,6 +209,32 @@ export async function updateNews(id, payload) {
   return clone(posts[idx]);
 }
 
+export async function uploadNewsImage(file) {
+  if (!file) return null;
+
+  if (await isApiAvailable()) {
+    const { csrfFetch } = await import('./csrf.js');
+    const body = new FormData();
+    body.append('image', file);
+    const res = await csrfFetch('api/upload-news-image.php', {
+      method: 'POST',
+      body,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Image upload failed.');
+    }
+    return data.image || null;
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Image upload failed.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function deleteNews(id) {
   if (await isApiAvailable()) {
     try {

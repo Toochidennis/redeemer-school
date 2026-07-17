@@ -148,3 +148,8 @@ vite.config.ts.timestamp-*
 
 # Local build output
 dist/
+
+# Runtime news uploads
+uploads/news/*
+!uploads/news/.gitkeep
+!uploads/.htaccess

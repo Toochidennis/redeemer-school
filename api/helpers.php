@@ -120,7 +120,14 @@ function is_allowed_image(string $image): bool {
         'redeemers/optimized/skills-workshop.webp',
         'redeemers/optimized/badge.webp',
     ];
-    return in_array($image, $allowed, true);
+    if (in_array($image, $allowed, true)) {
+        return true;
+    }
+    if (!preg_match('/^uploads\/news\/[a-z0-9][a-z0-9._-]*\.(jpe?g|png|webp|gif)$/i', $image)) {
+        return false;
+    }
+    $fullPath = __DIR__ . '/../' . $image;
+    return is_file($fullPath);
 }
 
 function validate_post(array $post): array {
