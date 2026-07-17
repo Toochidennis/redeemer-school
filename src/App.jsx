@@ -278,6 +278,19 @@ function NewsPostPreview({ post }) {
   );
 }
 
+function AdminAlert({ message, type = 'error', onClose }) {
+  if (!message) return null;
+  return (
+    <div className={`admin-alert ${type}`} role="alert">
+      <div>
+        <strong>{type === 'success' ? 'Done' : 'Please check this'}</strong>
+        <p>{message}</p>
+      </div>
+      {onClose && <button type="button" onClick={onClose} aria-label="Dismiss message">Close</button>}
+    </div>
+  );
+}
+
 function NewsDetail() {
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
@@ -343,6 +356,7 @@ function AdminNewsForm() {
   const [form, setForm] = useState({ title: '', slug: '', category: NEWS_CATEGORIES[0], image: NEWS_IMAGE_OPTIONS[0].value, summary: '', content: '', status: 'Draft' });
   const [uploading, setUploading] = useState(false);
   const [formMessage, setFormMessage] = useState('');
+  const [formMessageType, setFormMessageType] = useState('error');
   useEffect(() => {
     if (editId) {
       getAdminNewsById(editId).then((post) => post && setForm((current) => ({ ...current, ...post, status: (post.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft' })));
@@ -355,18 +369,22 @@ function AdminNewsForm() {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
+      setFormMessageType('error');
       setFormMessage('Please choose a valid image file.');
       return;
     }
     setUploading(true);
+    setFormMessageType('success');
     setFormMessage('Uploading image...');
     try {
       const image = await uploadNewsImage(file);
       if (image) {
         setField('image', image);
+        setFormMessageType('success');
         setFormMessage('Image uploaded and selected.');
       }
     } catch (error) {
+      setFormMessageType('error');
       setFormMessage(error.message || 'Image upload failed.');
     } finally {
       setUploading(false);
@@ -395,19 +413,23 @@ function AdminNewsForm() {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
+      setFormMessageType('error');
       setFormMessage('Please choose a valid image file.');
       return;
     }
     setUploading(true);
+    setFormMessageType('success');
     setFormMessage('Uploading content image...');
     try {
       const image = await uploadNewsImage(file);
       if (image) {
         const caption = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim() || 'News image';
         insertContentText(`![${caption}](${image})`);
+        setFormMessageType('success');
         setFormMessage('Image inserted into the content.');
       }
     } catch (error) {
+      setFormMessageType('error');
       setFormMessage(error.message || 'Image upload failed.');
     } finally {
       setUploading(false);
@@ -416,7 +438,17 @@ function AdminNewsForm() {
   }
   async function save(mode) {
     const payload = { ...form, status: mode === 'publish' ? 'published' : 'draft' };
-    if (!payload.title || !payload.summary || !payload.content || !payload.slug) return window.alert('Please enter title, slug, summary, and full content.');
+    const missing = [
+      !payload.title && 'title',
+      !payload.slug && 'slug',
+      !payload.summary && 'summary',
+      !payload.content && 'full content'
+    ].filter(Boolean);
+    if (missing.length > 0) {
+      setFormMessageType('error');
+      setFormMessage(`Add ${missing.join(', ')} before saving this post.`);
+      return;
+    }
     if (editId) await updateNews(editId, payload); else await createNews(payload);
     navigate('admin_news');
   }
@@ -461,7 +493,7 @@ function AdminNewsForm() {
             <label>Upload image<input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} /></label>
             <label>Or choose existing image<select value={form.image} onChange={(e) => setField('image', e.target.value)}>{NEWS_IMAGE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}{form.image && !NEWS_IMAGE_OPTIONS.some((item) => item.value === form.image) && <option value={form.image}>Uploaded image</option>}</select></label>
             <p className="admin-help">Uploaded images are saved with the news post and used on the news card and detail page.</p>
-            {formMessage && <p className="admin-message">{formMessage}</p>}
+            <AdminAlert message={formMessage} type={formMessageType} onClose={() => setFormMessage('')} />
             <div className="section-actions admin-editor-actions">
               <button className="btn btn-outline" type="button" onClick={() => navigate('admin_news')}>Cancel</button>
               <button className="btn btn-secondary" type="button" onClick={() => save('draft')} disabled={uploading}>Save draft</button>
