@@ -258,6 +258,26 @@ function renderNewsContent(content) {
   });
 }
 
+function NewsPostPreview({ post }) {
+  const title = post.title || 'News title';
+  const summary = post.summary || 'Short summary of the news post will appear here.';
+  return (
+    <article className="admin-live-preview">
+      <div className="admin-preview-head">
+        <span className="news-pill">{post.category || 'Notice'}</span>
+        <h2>{title}</h2>
+        <p>{summary}</p>
+      </div>
+      <figure className="admin-preview-cover">
+        <img src={post.image || NEWS_IMAGE_OPTIONS[0].value} alt={title} />
+      </figure>
+      <div className="news-article-body admin-preview-body">
+        {post.content ? renderNewsContent(post.content) : <p>Start typing the full content to preview the article body.</p>}
+      </div>
+    </article>
+  );
+}
+
 function NewsDetail() {
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
@@ -424,8 +444,15 @@ function AdminNewsForm() {
                 <label className="file-tool">Insert image in content<input type="file" accept="image/*" onChange={handleContentImageUpload} disabled={uploading} /></label>
                 <button className="admin-link-button" type="button" onClick={() => insertContentText(`![${form.title || 'News image'}](${form.image})`)}>Insert featured image</button>
               </div>
-              <p className="admin-help">Content images appear where inserted. Change the text inside square brackets to edit the image caption.</p>
+              <p className="admin-help">Use the preview below to check how paragraphs and images will appear before publishing.</p>
             </div>
+            <section className="admin-preview-panel">
+              <div className="admin-preview-title">
+                <span className="kicker">Live preview</span>
+                <h2>Post preview</h2>
+              </div>
+              <NewsPostPreview post={form} />
+            </section>
           </div>
           <aside className="admin-editor-side">
             <div className="image-editor-preview">
