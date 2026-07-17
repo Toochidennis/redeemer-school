@@ -595,6 +595,7 @@ textarea { min-height: 150px; resize: vertical; }
 .admin-link-button.danger { color: var(--red); }
 .status-pill { display: inline-flex; padding: 5px 8px; border-radius: 999px; font-size: 0.78rem; font-weight: 900; }
 .status-published { background: #dff5e7; color: var(--deep); }
+.status-ready { background: #e8f1ff; color: #164a7a; }
 .status-draft { background: #fff4d8; color: #7a4d00; }
 .admin-form { display: grid; gap: 16px; max-width: 860px; }
 .admin-editor {

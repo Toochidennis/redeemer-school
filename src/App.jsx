@@ -30,6 +30,7 @@ const SCHOOL = {
   mission: 'To provide holistic education through sound academics, Christian values, discipline, and character development in a safe and supportive learning environment.'
 };
 const WHATSAPP_NUMBER = '2348022470908';
+const NEWS_PUBLIC_LIVE = false;
 
 function routeFromLocation() {
   const parts = window.location.pathname.split('/').filter(Boolean);
@@ -382,6 +383,9 @@ function AdminNews() {
   const [pendingDelete, setPendingDelete] = useState(null);
   async function reload() { setPosts(await getAdminNews()); }
   useEffect(() => { reload(); }, []);
+  const publishedLabel = NEWS_PUBLIC_LIVE ? 'Published' : 'Ready';
+  const statusLabel = (item) => (item.status || '').toLowerCase() === 'published' ? publishedLabel : 'Draft';
+  const statusClass = (item) => (item.status || '').toLowerCase() === 'published' ? (NEWS_PUBLIC_LIVE ? 'published' : 'ready') : 'draft';
   const rows = posts.filter((item) => {
     const text = `${item.title} ${item.summary} ${item.category}`.toLowerCase();
     const itemStatus = (item.status || '').toLowerCase();
@@ -408,9 +412,10 @@ function AdminNews() {
     <AdminShell active="news">
       <div className="admin-toolbar"><div><span className="kicker">News desk</span><h1>Manage posts</h1></div><Link className="btn btn-primary" to="admin_news_form">Create post</Link></div>
       <section className="admin-panel">
+        {!NEWS_PUBLIC_LIVE && <AdminAlert message="Public news is paused for now. Posts marked Ready are saved for launch, but visitors will still see News coming soon." type="success" />}
         <AdminAlert message={message} type={messageType} onClose={() => setMessage('')} />
-        <div className="admin-toolbar"><label className="admin-search-label">Search posts<input type="search" value={query} onChange={(e) => setQuery(e.target.value)} /></label><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option></select></div>
-        <table className="admin-table"><thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{rows.map((item) => <tr key={item.id}><td><div className="admin-post-cell"><strong>{item.title}</strong><span>{item.summary || item.slug}</span></div></td><td>{item.category}</td><td><span className={`status-pill status-${(item.status || '').toLowerCase()}`}>{(item.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft'}</span></td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Not saved'}</td><td><div className="admin-table-actions"><Link className="admin-link-button" to={`admin_news_form?id=${encodeURIComponent(item.id)}`}>Edit</Link><Link className="admin-link-button" to={`news_detail?slug=${encodeURIComponent(item.slug)}&preview=1`}>View</Link><button className="admin-link-button" onClick={() => action(() => (item.status || '').toLowerCase() === 'published' ? unpublishNews(item.id) : publishNews(item.id), (item.status || '').toLowerCase() === 'published' ? `"${item.title}" has been unpublished.` : `"${item.title}" has been published.`)}>{(item.status || '').toLowerCase() === 'published' ? 'Unpublish' : 'Publish'}</button><button className="admin-link-button danger" onClick={() => setPendingDelete(item)}>Delete</button></div></td></tr>)}</tbody></table>
+        <div className="admin-toolbar"><label className="admin-search-label">Search posts<input type="search" value={query} onChange={(e) => setQuery(e.target.value)} /></label><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option><option value="published">{publishedLabel}</option><option value="draft">Draft</option></select></div>
+        <table className="admin-table"><thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>{rows.map((item) => <tr key={item.id}><td><div className="admin-post-cell"><strong>{item.title}</strong><span>{item.summary || item.slug}</span></div></td><td>{item.category}</td><td><span className={`status-pill status-${statusClass(item)}`}>{statusLabel(item)}</span></td><td>{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : 'Not saved'}</td><td><div className="admin-table-actions"><Link className="admin-link-button" to={`admin_news_form?id=${encodeURIComponent(item.id)}`}>Edit</Link><Link className="admin-link-button" to={`news_detail?slug=${encodeURIComponent(item.slug)}&preview=1`}>Preview</Link><button className="admin-link-button" onClick={() => action(() => (item.status || '').toLowerCase() === 'published' ? unpublishNews(item.id) : publishNews(item.id), (item.status || '').toLowerCase() === 'published' ? `"${item.title}" has been moved back to draft.` : `"${item.title}" is ready for launch.`)}>{(item.status || '').toLowerCase() === 'published' ? 'Move to draft' : 'Mark ready'}</button><button className="admin-link-button danger" onClick={() => setPendingDelete(item)}>Delete</button></div></td></tr>)}</tbody></table>
       </section>
       <ConfirmDialog open={Boolean(pendingDelete)} title="Delete this post?" message={pendingDelete ? `This will permanently remove "${pendingDelete.title}" from the news list.` : ''} confirmLabel="Delete post" onCancel={() => setPendingDelete(null)} onConfirm={confirmDelete} />
     </AdminShell>
@@ -425,6 +430,7 @@ function AdminNewsForm() {
   const [uploading, setUploading] = useState(false);
   const [formMessage, setFormMessage] = useState('');
   const [formMessageType, setFormMessageType] = useState('error');
+  const publishedLabel = NEWS_PUBLIC_LIVE ? 'Published' : 'Ready';
   useEffect(() => {
     if (editId) {
       getAdminNewsById(editId).then((post) => post && setForm((current) => ({ ...current, ...post, status: (post.status || '').toLowerCase() === 'published' ? 'Published' : 'Draft' })));
@@ -527,13 +533,14 @@ function AdminNewsForm() {
         <Link className="btn btn-outline" to="admin_news">Back to posts</Link>
       </div>
       <section className="admin-panel">
+        {!NEWS_PUBLIC_LIVE && <AdminAlert message="Public news is paused. Marking a post Ready saves it for launch, but visitors will still see News coming soon." type="success" />}
         <form className="admin-form admin-editor">
           <div className="admin-editor-main">
             <label>Title<input value={form.title} onChange={(e) => setField('title', e.target.value)} /></label>
             <label>Slug<input value={form.slug} onChange={(e) => setField('slug', e.target.value)} /></label>
             <div className="grid-2">
               <label>Category<select value={form.category} onChange={(e) => setField('category', e.target.value)}>{NEWS_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
-              <label>Status<select value={form.status} onChange={(e) => setField('status', e.target.value)}><option>Draft</option><option>Published</option></select></label>
+              <label>Status<select value={form.status} onChange={(e) => setField('status', e.target.value)}><option>Draft</option><option value="Published">{publishedLabel}</option></select></label>
             </div>
             <label>Summary<textarea className="summary-field" value={form.summary} onChange={(e) => setField('summary', e.target.value)} /></label>
             <div className="content-editor">
@@ -565,7 +572,7 @@ function AdminNewsForm() {
             <div className="section-actions admin-editor-actions">
               <button className="btn btn-outline" type="button" onClick={() => navigate('admin_news')}>Cancel</button>
               <button className="btn btn-secondary" type="button" onClick={() => save('draft')} disabled={uploading}>Save draft</button>
-              <button className="btn btn-primary" type="button" onClick={() => save('publish')} disabled={uploading}>Publish</button>
+              <button className="btn btn-primary" type="button" onClick={() => save('publish')} disabled={uploading}>{NEWS_PUBLIC_LIVE ? 'Publish' : 'Mark ready'}</button>
             </div>
           </aside>
         </form>
