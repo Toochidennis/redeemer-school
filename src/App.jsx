@@ -127,6 +127,34 @@ function NewsCard({ post }) {
   );
 }
 
+function NewsComingSoon({ compact = false }) {
+  return (
+    <section className={compact ? 'news-coming compact' : 'section news-coming'}>
+      <div className="container news-coming-grid">
+        <div>
+          <span className="kicker">News desk</span>
+          <h2>News coming soon</h2>
+          <p>School announcements, notices, and event updates will be published here when the news desk is ready.</p>
+          <div className="section-actions"><Link className="btn btn-secondary" to="contact">Contact the school</Link></div>
+        </div>
+        <div className="speaker-graphic" aria-hidden="true">
+          <div className="speaker-card">
+            <span className="speaker-dot"></span>
+            <div className="speaker-lines"><span></span><span></span><span></span></div>
+          </div>
+          <div className="speaker-body">
+            <span className="speaker-mouth"></span>
+            <span className="speaker-handle"></span>
+            <span className="sound-wave wave-one"></span>
+            <span className="sound-wave wave-two"></span>
+            <span className="sound-wave wave-three"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ContactForm({ admission = false }) {
   const [message, setMessage] = useState('');
   function submit(event) {
@@ -163,8 +191,6 @@ function ContactForm({ admission = false }) {
 }
 
 function Home() {
-  const [posts, setPosts] = useState([]);
-  useEffect(() => { getPublicNews().then((items) => setPosts(items.slice(0, 3))); }, []);
   return (
     <>
       <section className="hero">
@@ -180,7 +206,7 @@ function Home() {
       <section className="section"><div className="container"><SectionHead kicker="School Life" title="Junior and senior secondary learning with purpose." text="RISE serves students across two major class divisions: Junior Secondary and Senior Secondary." /><div className="grid-3"><article className="card"><h3>Academic excellence</h3><p>Students are guided through structured lessons, assessment, and teacher-led academic support.</p></article><article className="card"><h3>Arts and activities</h3><p>The school continues to develop arts and extra-curricular programmes that strengthen character and confidence.</p></article><article className="card"><h3>Character formation</h3><p>Faith, diligence, discipline, and hard work shape the school’s approach to secondary education.</p></article></div></div></section>
       <section className="section alt"><div className="container"><SectionHead kicker="Core Values" title="The values that shape student life." text="RISE builds learning around faith, excellence, discipline, integrity, and service." /><div className="grid-3">{SCHOOL.values.map((value) => <article className="card" key={value}><h3>{value}</h3><p>{value === 'Fear of God' ? 'Students are guided to honour God in learning, conduct, and relationships.' : value === 'Excellence' ? 'Students are encouraged to pursue strong academic and personal standards.' : value === 'Discipline' ? 'Students learn habits of order, focus, respect, and responsibility.' : value === 'Integrity' ? 'Students are taught honesty, accountability, and sound moral choices.' : 'Students are encouraged to contribute positively to their homes and society.'}</p></article>)}</div></div></section>
       <section className="section alt"><div className="container feature-layout"><div><span className="kicker">Why RISE</span><h2>Partnership between church, home, and school.</h2><ul className="rail-list"><li><strong>Strong leaders</strong><br />The school works to produce strong and effective young leaders who can impact their homes and society.</li><li><strong>Excellence through diligence</strong><br />Students are encouraged to grow through hard work, discipline, and steady academic effort.</li><li><strong>University readiness</strong><br />RISE graduates are known for strong acceptance into local and foreign-based universities.</li></ul></div><div className="image-panel"><img src="redeemers/optimized/laboratory.webp" alt="Students working in the school laboratory" /></div></div></section>
-      <section className="section"><div className="container"><SectionHead kicker="Latest" title="News and notices" text="Published posts from the school news desk appear here. The admin area can add, edit, publish, and remove updates." /><div className="grid-3">{posts.map((post) => <NewsCard key={post.id} post={post} />)}</div><div className="section-actions"><Link className="btn btn-secondary" to="news">View all news</Link></div></div></section>
+      <NewsComingSoon compact />
       <section className="section dark"><div className="container gallery"><img src="redeemers/optimized/classroom.webp" alt="Students seated in class" /><img src="redeemers/optimized/practical-learning.webp" alt="Students observing practical work" /><img src="redeemers/optimized/excursion.webp" alt="Students on guided practical visit" /><img src="redeemers/optimized/skills-workshop.webp" alt="Students around workshop materials" /><img src="redeemers/optimized/school-block.webp" alt="School building exterior" /></div></section>
     </>
   );
@@ -227,16 +253,10 @@ function Contact() {
 }
 
 function NewsList() {
-  const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(1);
-  const perPage = 6;
-  useEffect(() => { getPublicNews().then(setPosts); }, []);
-  const total = Math.max(1, Math.ceil(posts.length / perPage));
-  const pagePosts = posts.slice((page - 1) * perPage, page * perPage);
   return (
     <>
-      <PageHero kicker="News" title="School updates and notices." text="Published posts are served by the file-based PHP CMS." image="redeemers/optimized/excursion.webp" alt="Students on practical visit" />
-      <section className="section"><div className="container"><div className="grid-3">{pagePosts.map((post) => <NewsCard key={post.id} post={post} />)}</div>{posts.length === 0 && <p className="center-note">No published news available right now.</p>}<nav className="pagination" aria-label="News pagination">{Array.from({ length: total }, (_, idx) => idx + 1).map((num) => <button key={num} className={num === page ? 'is-active' : ''} onClick={() => setPage(num)}>{num}</button>)}</nav></div></section>
+      <PageHero kicker="News" title="School updates and notices." text="This page is being prepared for official school announcements and event updates." image="redeemers/optimized/excursion.webp" alt="Students on practical visit" />
+      <NewsComingSoon />
     </>
   );
 }
@@ -311,7 +331,9 @@ function NewsDetail() {
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
   const slug = new URLSearchParams(window.location.search).get('slug') || '';
+  const preview = new URLSearchParams(window.location.search).get('preview') === '1';
   useEffect(() => {
+    if (!preview) return;
     async function load() {
       const item = await getNewsBySlug(slug);
       setPost(item);
@@ -320,7 +342,8 @@ function NewsDetail() {
       if (item) document.title = `${item.title} | Redeemers International Secondary School`;
     }
     load();
-  }, [slug]);
+  }, [slug, preview]);
+  if (!preview) return <><PageHero kicker="News" title="School updates and notices." text="This page is being prepared for official school announcements and event updates." image="redeemers/optimized/excursion.webp" alt="Students on practical visit" /><NewsComingSoon /></>;
   if (!post) return <section className="section"><div className="container"><h1>News not found</h1><p>The requested news item is unavailable.</p><Link className="btn btn-secondary" to="news">Back to News</Link></div></section>;
   return (
     <>
