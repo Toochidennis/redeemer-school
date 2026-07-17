@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import { NEWS_CATEGORIES, NEWS_IMAGE_OPTIONS } from './news-data.js';
@@ -241,6 +241,23 @@ function NewsList() {
   );
 }
 
+function renderNewsContent(content) {
+  const imagePattern = /^!\[(.*?)\]\((.*?)\)$/;
+  return String(content || '').split(/\n+/).map((part, index) => {
+    const trimmed = part.trim();
+    const image = trimmed.match(imagePattern);
+    if (image) {
+      return (
+        <figure className="news-content-image" key={`${trimmed}-${index}`}>
+          <img src={image[2]} alt={image[1] || 'News content'} />
+          {image[1] && <figcaption>{image[1]}</figcaption>}
+        </figure>
+      );
+    }
+    return trimmed ? <p key={`${trimmed}-${index}`}>{trimmed}</p> : null;
+  });
+}
+
 function NewsDetail() {
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
@@ -258,7 +275,7 @@ function NewsDetail() {
   if (!post) return <section className="section"><div className="container"><h1>News not found</h1><p>The requested news item is unavailable.</p><Link className="btn btn-secondary" to="news">Back to News</Link></div></section>;
   return (
     <>
-      <article className="news-article"><header className="news-article-hero"><Link className="news-back-link" to="news">← Back to News</Link><span className="news-pill">{post.category}</span><h1>{post.title}</h1><p>{post.summary}</p></header><figure className="news-article-figure"><img className="news-detail-image" src={post.image} alt={post.title} /></figure><div className="news-article-layout"><div className="news-article-body">{String(post.content || '').split(/\n+/).map((part) => <p key={part}>{part}</p>)}</div><aside className="news-article-side"><h2>Need more information?</h2><p>Contact the school office for admissions, visits, and general enquiries.</p><Link className="btn btn-secondary" to="contact">Contact Us</Link><Link className="btn btn-outline" to="admissions">Admissions</Link></aside></div></article>
+      <article className="news-article"><header className="news-article-hero"><Link className="news-back-link" to="news">← Back to News</Link><span className="news-pill">{post.category}</span><h1>{post.title}</h1><p>{post.summary}</p></header><figure className="news-article-figure"><img className="news-detail-image" src={post.image} alt={post.title} /></figure><div className="news-article-layout"><div className="news-article-body">{renderNewsContent(post.content)}</div><aside className="news-article-side"><h2>Need more information?</h2><p>Contact the school office for admissions, visits, and general enquiries.</p><Link className="btn btn-secondary" to="contact">Contact Us</Link><Link className="btn btn-outline" to="admissions">Admissions</Link></aside></div></article>
       <section className="section alt"><div className="container"><SectionHead kicker="More updates" title="Related news" text="Other published notices from the school." /><div className="grid-3">{related.map((item) => <NewsCard key={item.id} post={item} />)}</div></div></section>
     </>
   );
@@ -302,6 +319,7 @@ function AdminNews() {
 function AdminNewsForm() {
   const params = new URLSearchParams(window.location.search);
   const editId = params.get('id');
+  const contentRef = useRef(null);
   const [form, setForm] = useState({ title: '', slug: '', category: NEWS_CATEGORIES[0], image: NEWS_IMAGE_OPTIONS[0].value, summary: '', content: '', status: 'Draft' });
   const [uploading, setUploading] = useState(false);
   const [formMessage, setFormMessage] = useState('');
@@ -335,6 +353,47 @@ function AdminNewsForm() {
       event.target.value = '';
     }
   }
+  function insertContentText(text) {
+    const input = contentRef.current;
+    if (!input) {
+      setField('content', `${form.content}\n\n${text}`.trim());
+      return;
+    }
+    const start = input.selectionStart ?? form.content.length;
+    const end = input.selectionEnd ?? form.content.length;
+    const before = form.content.slice(0, start).replace(/\s*$/, '');
+    const after = form.content.slice(end).replace(/^\s*/, '');
+    const next = `${before}${before ? '\n\n' : ''}${text}${after ? `\n\n${after}` : ''}`;
+    setField('content', next);
+    requestAnimationFrame(() => {
+      input.focus();
+      const cursor = before.length + (before ? 2 : 0) + text.length;
+      input.setSelectionRange(cursor, cursor);
+    });
+  }
+  async function handleContentImageUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setFormMessage('Please choose a valid image file.');
+      return;
+    }
+    setUploading(true);
+    setFormMessage('Uploading content image...');
+    try {
+      const image = await uploadNewsImage(file);
+      if (image) {
+        const caption = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim() || 'News image';
+        insertContentText(`![${caption}](${image})`);
+        setFormMessage('Image inserted into the content.');
+      }
+    } catch (error) {
+      setFormMessage(error.message || 'Image upload failed.');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
+  }
   async function save(mode) {
     const payload = { ...form, status: mode === 'publish' ? 'published' : 'draft' };
     if (!payload.title || !payload.summary || !payload.content || !payload.slug) return window.alert('Please enter title, slug, summary, and full content.');
@@ -357,7 +416,16 @@ function AdminNewsForm() {
               <label>Status<select value={form.status} onChange={(e) => setField('status', e.target.value)}><option>Draft</option><option>Published</option></select></label>
             </div>
             <label>Summary<textarea className="summary-field" value={form.summary} onChange={(e) => setField('summary', e.target.value)} /></label>
-            <label>Full content<textarea className="content-field" value={form.content} onChange={(e) => setField('content', e.target.value)} /></label>
+            <div className="content-editor">
+              <div className="content-editor-head">
+                <label>Full content<textarea ref={contentRef} className="content-field" value={form.content} onChange={(e) => setField('content', e.target.value)} /></label>
+              </div>
+              <div className="content-editor-tools">
+                <label className="file-tool">Insert image in content<input type="file" accept="image/*" onChange={handleContentImageUpload} disabled={uploading} /></label>
+                <button className="admin-link-button" type="button" onClick={() => insertContentText(`![${form.title || 'News image'}](${form.image})`)}>Insert featured image</button>
+              </div>
+              <p className="admin-help">Content images appear where inserted. Change the text inside square brackets to edit the image caption.</p>
+            </div>
           </div>
           <aside className="admin-editor-side">
             <div className="image-editor-preview">
