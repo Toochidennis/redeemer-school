@@ -1,6 +1,6 @@
 <?php
 define('ADMIN_USERNAME', 'admin');
-define('ADMIN_PASSWORD_HASH', '');
+define('ADMIN_PASSWORD_HASH', '$2y$10$BJP3EICXtL4kmRV00UevyeiSTlTIPFDZxBhXDhw.D0CHBZnttVW2q');
 
 define('DATA_DIR', __DIR__ . '/../data');
 define('NEWS_FILE', DATA_DIR . '/news.json');
